@@ -1,0 +1,6 @@
+framework module Pods_Comuse {
+  umbrella header "Pods-Comuse-umbrella.h"
+
+  export *
+  module * { export * }
+}
