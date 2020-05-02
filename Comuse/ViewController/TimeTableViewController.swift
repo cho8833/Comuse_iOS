@@ -14,7 +14,6 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
     @IBOutlet weak var timeTable: Elliotable!
     private let day = ["MON","TUE","WED","THU","FRI","SAT","SUN"]
     private var items: [ElliottEvent] = []
-    let course_1 = ElliottEvent(courseId: "c0001", courseName: "Operating System", roomName: "IT Building 21204", professor: "TEST", courseDay: .tuesday, startTime: "12:00", endTime: "13:15", backgroundColor: UIColor.yellow)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,7 +54,6 @@ extension TimeTableViewController {
     }
     
     func courseItems(in elliotable: Elliotable) -> [ElliottEvent] {
-        items.append(course_1)
         return items
     }
 }

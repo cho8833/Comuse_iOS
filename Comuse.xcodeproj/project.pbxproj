@@ -8,6 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		65D935D4FBC8D68420C6CD6D /* Pods_Comuse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D13D483D4F53B9D8A6CCF61 /* Pods_Comuse.framework */; };
+		660E5BFB245D2E6F007154A1 /* FirebaseVar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660E5BFA245D2E6F007154A1 /* FirebaseVar.swift */; };
+		660E5BFD245D3312007154A1 /* GoogleSignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660E5BFC245D3312007154A1 /* GoogleSignInViewController.swift */; };
+		665630BB245C4F5800A50100 /* Member.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665630BA245C4F5800A50100 /* Member.swift */; };
+		665630BD245C4F6200A50100 /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665630BC245C4F6200A50100 /* Schedule.swift */; };
+		665630BF245C512200A50100 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 665630BE245C512200A50100 /* GoogleService-Info.plist */; };
+		665630C1245C565200A50100 /* Time.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665630C0245C565200A50100 /* Time.swift */; };
+		665630C3245C5AE400A50100 /* MembersTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665630C2245C5AE400A50100 /* MembersTableViewController.swift */; };
 		665AB835245C422A003C766D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665AB834245C422A003C766D /* AppDelegate.swift */; };
 		665AB837245C422A003C766D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665AB836245C422A003C766D /* SceneDelegate.swift */; };
 		665AB83C245C422A003C766D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 665AB83A245C422A003C766D /* Main.storyboard */; };
@@ -15,11 +22,17 @@
 		665AB841245C422A003C766D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 665AB83F245C422A003C766D /* LaunchScreen.storyboard */; };
 		665AB849245C44A7003C766D /* TimeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665AB848245C44A7003C766D /* TimeTableViewController.swift */; };
 		665AB84B245C44B0003C766D /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665AB84A245C44B0003C766D /* SettingsViewController.swift */; };
-		665AB84D245C44BF003C766D /* MembersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665AB84C245C44BF003C766D /* MembersViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1365BD6E4D2CE6FC6A99D7E2 /* Pods-Comuse.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Comuse.debug.xcconfig"; path = "Target Support Files/Pods-Comuse/Pods-Comuse.debug.xcconfig"; sourceTree = "<group>"; };
+		660E5BFA245D2E6F007154A1 /* FirebaseVar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseVar.swift; sourceTree = "<group>"; };
+		660E5BFC245D3312007154A1 /* GoogleSignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInViewController.swift; sourceTree = "<group>"; };
+		665630BA245C4F5800A50100 /* Member.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Member.swift; sourceTree = "<group>"; };
+		665630BC245C4F6200A50100 /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
+		665630BE245C512200A50100 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		665630C0245C565200A50100 /* Time.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Time.swift; sourceTree = "<group>"; };
+		665630C2245C5AE400A50100 /* MembersTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembersTableViewController.swift; sourceTree = "<group>"; };
 		665AB831245C422A003C766D /* Comuse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Comuse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		665AB834245C422A003C766D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		665AB836245C422A003C766D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -29,7 +42,6 @@
 		665AB842245C422A003C766D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		665AB848245C44A7003C766D /* TimeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTableViewController.swift; sourceTree = "<group>"; };
 		665AB84A245C44B0003C766D /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
-		665AB84C245C44BF003C766D /* MembersViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembersViewController.swift; sourceTree = "<group>"; };
 		6D13D483D4F53B9D8A6CCF61 /* Pods_Comuse.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Comuse.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D07E046CB37576AFA9DA6FB3 /* Pods-Comuse.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Comuse.release.xcconfig"; path = "Target Support Files/Pods-Comuse/Pods-Comuse.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -46,6 +58,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		665630B9245C4F3F00A50100 /* DataType */ = {
+			isa = PBXGroup;
+			children = (
+				665630BA245C4F5800A50100 /* Member.swift */,
+				665630BC245C4F6200A50100 /* Schedule.swift */,
+				665630C0245C565200A50100 /* Time.swift */,
+				660E5BFA245D2E6F007154A1 /* FirebaseVar.swift */,
+			);
+			path = DataType;
+			sourceTree = "<group>";
+		};
 		665AB828245C422A003C766D = {
 			isa = PBXGroup;
 			children = (
@@ -67,6 +90,7 @@
 		665AB833245C422A003C766D /* Comuse */ = {
 			isa = PBXGroup;
 			children = (
+				665630B9245C4F3F00A50100 /* DataType */,
 				665AB84E245C44C7003C766D /* ViewController */,
 				665AB834245C422A003C766D /* AppDelegate.swift */,
 				665AB836245C422A003C766D /* SceneDelegate.swift */,
@@ -74,6 +98,7 @@
 				665AB83D245C422A003C766D /* Assets.xcassets */,
 				665AB83F245C422A003C766D /* LaunchScreen.storyboard */,
 				665AB842245C422A003C766D /* Info.plist */,
+				665630BE245C512200A50100 /* GoogleService-Info.plist */,
 			);
 			path = Comuse;
 			sourceTree = "<group>";
@@ -83,7 +108,8 @@
 			children = (
 				665AB848245C44A7003C766D /* TimeTableViewController.swift */,
 				665AB84A245C44B0003C766D /* SettingsViewController.swift */,
-				665AB84C245C44BF003C766D /* MembersViewController.swift */,
+				665630C2245C5AE400A50100 /* MembersTableViewController.swift */,
+				660E5BFC245D3312007154A1 /* GoogleSignInViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -117,6 +143,7 @@
 				665AB82E245C422A003C766D /* Frameworks */,
 				665AB82F245C422A003C766D /* Resources */,
 				0475821662A7B2F36B4F8B97 /* [CP] Embed Pods Frameworks */,
+				601BAF346B0146C9841BEECA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -166,6 +193,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				665AB841245C422A003C766D /* LaunchScreen.storyboard in Resources */,
+				665630BF245C512200A50100 /* GoogleService-Info.plist in Resources */,
 				665AB83E245C422A003C766D /* Assets.xcassets in Resources */,
 				665AB83C245C422A003C766D /* Main.storyboard in Resources */,
 			);
@@ -189,6 +217,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Comuse/Pods-Comuse-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		601BAF346B0146C9841BEECA /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Comuse/Pods-Comuse-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Comuse/Pods-Comuse-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Comuse/Pods-Comuse-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		BA5B2470ABC62238CC48C604 /* [CP] Check Pods Manifest.lock */ = {
@@ -221,10 +266,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				665AB835245C422A003C766D /* AppDelegate.swift in Sources */,
+				665630BB245C4F5800A50100 /* Member.swift in Sources */,
+				665630C3245C5AE400A50100 /* MembersTableViewController.swift in Sources */,
 				665AB849245C44A7003C766D /* TimeTableViewController.swift in Sources */,
-				665AB84D245C44BF003C766D /* MembersViewController.swift in Sources */,
+				665630C1245C565200A50100 /* Time.swift in Sources */,
 				665AB84B245C44B0003C766D /* SettingsViewController.swift in Sources */,
+				660E5BFD245D3312007154A1 /* GoogleSignInViewController.swift in Sources */,
+				665630BD245C4F6200A50100 /* Schedule.swift in Sources */,
 				665AB837245C422A003C766D /* SceneDelegate.swift in Sources */,
+				660E5BFB245D2E6F007154A1 /* FirebaseVar.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,15 +1,15 @@
 //
-//  MembersViewController.swift
+//  GoogleSignInViewController.swift
 //  Comuse
 //
-//  Created by 조현빈 on 2020/05/01.
+//  Created by 조현빈 on 2020/05/02.
 //  Copyright © 2020 hyunbin. All rights reserved.
 //
 
 import UIKit
 
-class MembersViewController: UIViewController {
-
+class GoogleSignInViewController: UIViewController {
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
