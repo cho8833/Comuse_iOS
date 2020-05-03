@@ -10,6 +10,7 @@ pod 'Firebase/Firestore'
 pod 'Firebase/Analytics'
 pod 'FirebaseFirestoreSwift'
 pod 'GoogleSignIn'
+pod 'ObjectMapper'
   # Pods for Comuse
 
 end

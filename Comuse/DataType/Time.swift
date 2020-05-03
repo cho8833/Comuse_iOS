@@ -16,3 +16,6 @@ struct Time: Codable {
         self.minute = minute
     }
 }
+func == (lhs: Time, rhs: Time) -> Bool {
+    return (lhs.hour == rhs.hour && lhs.minute == rhs.minute)
+}

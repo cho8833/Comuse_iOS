@@ -10,10 +10,12 @@
 import GoogleSignIn
 import FirebaseFirestore
 import FirebaseAuth
+import ObjectMapper
 struct FirebaseVar {
     public static var user: User?
     public static var db: Firestore?
 }
+//MARK: save as [String:Any?]
 extension DocumentReference {
     func setData(optionalData: [String: Any?], completion: @escaping (Error?) -> Void) {
         let documentDataWithNullObject = optionalData.mapValues {
@@ -24,3 +26,4 @@ extension DocumentReference {
         }
     }
 }
+
