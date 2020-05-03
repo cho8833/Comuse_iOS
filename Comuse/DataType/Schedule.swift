@@ -16,28 +16,29 @@ struct Schedule {
     var classPlace: String?
     var professorName: String
     var classTitle: String
-    init(day: Int, startTime: Time, endTime: Time, professorName: String, classTitle: String) {
-        self.day = day
-        self.startTime = startTime
-        self.endTime = endTime
-        self.classPlace = nil
-        self.professorName = professorName
-        self.classTitle = classTitle
-    }
+    
     
 
 }
 //MARK: - JSON -> Schedule Methods
 extension Schedule: Mappable {
     init?(map: Map) {
-        self.day = map.JSON["day"] as! Int
-        self.startTime = map.JSON["startTime"] as! Time
-        self.endTime = map.JSON["endTime"] as! Time
-        if let classPlace = map.JSON["classPlace"] as? String {
-            self.classPlace = classPlace
-        } else { self.classPlace = nil }
-        self.professorName = map.JSON["professorName"] as! String
-        self.classTitle = map.JSON["classTitle"] as! String
+        if let day = map.JSON["day"] as? Int {
+            self.day = day
+        } else { return nil }
+        if let startTime = Time(JSON: map.JSON["startTime"] as! [String : Any]) {
+            self.startTime = startTime
+        } else { return nil }
+        if let endTime = Time(JSON: map.JSON["endTime"] as! [String : Any]) {
+            self.endTime = endTime
+        } else { return nil }
+        if let professorName = map.JSON["professorName"] as? String {
+            self.professorName = professorName
+        } else { return nil }
+        if let classTitle = map.JSON["classTitle"] as? String {
+            self.classTitle = classTitle
+        } else { return nil }
+        self.classPlace = nil
     }
     
     mutating func mapping(map: Map) {
@@ -64,6 +65,7 @@ extension Schedule {
                         if (diff.type == .added) {
                             if let added = Schedule(JSON: diff.document.data()) {
                                 schedules.append(added)
+                                print(added)
                                 //notify TimeTable
                             }
                         }

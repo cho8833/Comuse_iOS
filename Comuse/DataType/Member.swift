@@ -116,7 +116,7 @@ extension Member {
     public static func getMembers() -> Void {
         if let _ = FirebaseVar.user {
             if let db = FirebaseVar.db {
-                db.collection("cities").whereField("state", isEqualTo: "CA")
+                db.collection("Members")
                 .addSnapshotListener { querySnapshot, error in
                     guard let snapshot = querySnapshot else {
                         print("Error fetching snapshots: \(error!)")
@@ -126,6 +126,7 @@ extension Member {
                         if (diff.type == .added) {
                             if let member = Member(JSON: diff.document.data()) {
                                 self.members.append(member)
+                                print(member)
                                 //notify tableView
                             }
                         }

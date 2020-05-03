@@ -22,6 +22,7 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
         timeTable.roundCorner = .none
         timeTable.borderColor = UIColor(red: 0.85, green: 0.85, blue: 0.85, alpha: 1.0)
         // Do any additional setup after loading the view.
+        Schedule.getSchedules()
     }
     
 
