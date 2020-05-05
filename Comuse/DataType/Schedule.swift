@@ -16,9 +16,6 @@ struct Schedule {
     var classPlace: String?
     var professorName: String
     var classTitle: String
-    
-    
-
 }
 //MARK: - JSON -> Schedule Methods
 extension Schedule: Mappable {
@@ -53,7 +50,7 @@ extension Schedule: Mappable {
 //MARK: - Get Schedules
 extension Schedule {
     public static var schedules: [Schedule] = []
-    public static func getSchedules() -> Void {
+    public static func getSchedules(reload:@escaping () -> Void, addFunc:@escaping (Schedule) -> Void, removeFunc:@escaping (String) -> Void) -> Void {
         if let _ = FirebaseVar.user {
             if let db = FirebaseVar.db {
                 db.collection("TimeTable").addSnapshotListener { querySnapshot, error in
@@ -65,20 +62,20 @@ extension Schedule {
                         if (diff.type == .added) {
                             if let added = Schedule(JSON: diff.document.data()) {
                                 schedules.append(added)
-                                print(added)
-                                //notify TimeTable
+                                addFunc(added)
                             }
                         }
-                        
                         if (diff.type == .removed) {
                             if let removed = Schedule(JSON: diff.document.data()) {
                                 if let indexOfElement = schedules.firstIndex(where:{ self.compareSchedule(s1: removed, s2: $0) }) {
                                     schedules.remove(at: indexOfElement)
-                                    //notify TimeTable
+                                    let id = String(format: "%02d", removed.startTime.hour) + String(format: "%02d", removed.startTime.minute) + String(format: "%02d", removed.endTime.hour) + String(format: "%02d", removed.endTime.minute) + String(removed.day)
+                                    removeFunc(id)
                                 }
                             }
                         }
                     }
+                    reload()
                 }
             }
         }
@@ -88,5 +85,9 @@ extension Schedule {
             return true
         } else { return false }
     }
+}
+//MARK: -MyScheduleControl
+extension Schedule {
+    
 }
 

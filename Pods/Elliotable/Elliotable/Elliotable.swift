@@ -195,7 +195,7 @@ public enum roundOption: Int {
         
 //        daySymbolText = self.userDaySymbol ?? Calendar.current.shortStandaloneWeekdaySymbols
         
-        let startIndex = self.startDay.rawValue - 1
+        let startIndex = self.startDay.rawValue - 1 
         daySymbolText.rotate(shiftingToStart: startIndex)
         return daySymbolText
     }
@@ -285,7 +285,7 @@ public enum roundOption: Int {
         minimumCourseStartTime = minStartTimeHour
         
         for (index, courseItem) in courseItems.enumerated() {
-            let dayCount = dataSource?.numberOfDays(in: self) ?? 6
+            let dayCount = dataSource?.numberOfDays(in: self) ?? 7
             let weekdayIndex = (courseItem.courseDay.rawValue - startDay.rawValue + dayCount) % dayCount
             
             let courseStartHour = Int(courseItem.startTime.split(separator: ":")[0]) ?? 09

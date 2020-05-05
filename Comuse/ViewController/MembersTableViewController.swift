@@ -24,7 +24,7 @@ class MembersTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        Member.getMembers()
+        Member.getMembers(reload: self.tableView.reloadData)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -35,18 +35,23 @@ class MembersTableViewController: UITableViewController {
     // MARK: - Table view data source
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return Member.members.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "memberCell", for: indexPath)
+        guard indexPath.row < Member.members.count else { return cell }
         
+        let member: Member = Member.members[indexPath.row]
+        cell.textLabel?.text = member.name
+        if member.inoutStatus == true { cell.detailTextLabel?.text = "in" }
+        else { cell.detailTextLabel?.text = "out" }
 
         return cell
     }

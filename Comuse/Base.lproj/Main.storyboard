@@ -31,7 +31,11 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <navigationItem key="navigationItem" title="TimeTable" id="kFK-z1-2Rz">
-                        <barButtonItem key="rightBarButtonItem" title="Add" id="2mc-h4-i98"/>
+                        <barButtonItem key="rightBarButtonItem" title="Add" id="2mc-h4-i98">
+                            <connections>
+                                <segue destination="Xgx-px-DZz" kind="presentation" id="TYP-ed-BkA"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="timeTable" destination="H2d-24-8aL" id="3xO-fl-BIL"/>
@@ -40,6 +44,21 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2016.8" y="137.18140929535232"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="SVK-ik-Gk2">
+            <objects>
+                <viewController id="Xgx-px-DZz" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Zgl-ci-bHm">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="tZ4-MX-Nf9"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="D1y-fe-FAW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2756" y="137"/>
         </scene>
         <!--Settings-->
         <scene sceneID="CWD-zW-w0s">

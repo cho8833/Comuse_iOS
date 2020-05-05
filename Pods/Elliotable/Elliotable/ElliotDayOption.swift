@@ -9,6 +9,7 @@
 import Foundation
 
 public enum ElliotDay: Int {
+    
     case monday    = 1
     case tuesday   = 2
     case wednesday = 3

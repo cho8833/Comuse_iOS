@@ -113,7 +113,7 @@ extension Member {
 extension Member {
     public static var members: [Member] = []
     
-    public static func getMembers() -> Void {
+    public static func getMembers(reload:@escaping () -> Void) -> Void {
         if let _ = FirebaseVar.user {
             if let db = FirebaseVar.db {
                 db.collection("Members")
@@ -126,7 +126,7 @@ extension Member {
                         if (diff.type == .added) {
                             if let member = Member(JSON: diff.document.data()) {
                                 self.members.append(member)
-                                print(member)
+                                
                                 //notify tableView
                             }
                         }
@@ -148,6 +148,7 @@ extension Member {
                             }
                         }
                     }
+                    reload()
                 }
             }
         }
