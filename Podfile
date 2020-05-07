@@ -7,7 +7,6 @@ target 'Comuse' do
 pod 'Elliotable'
 pod 'Firebase/Auth'
 pod 'Firebase/Firestore'
-pod 'Firebase/Analytics'
 pod 'FirebaseFirestoreSwift'
 pod 'GoogleSignIn'
 pod 'ObjectMapper'

@@ -22,6 +22,7 @@
 		665AB841245C422A003C766D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 665AB83F245C422A003C766D /* LaunchScreen.storyboard */; };
 		665AB849245C44A7003C766D /* TimeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665AB848245C44A7003C766D /* TimeTableViewController.swift */; };
 		665AB84B245C44B0003C766D /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665AB84A245C44B0003C766D /* SettingsViewController.swift */; };
+		66E1DABF24628D2100BF5626 /* EditAddScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66E1DABE24628D2100BF5626 /* EditAddScheduleViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		665AB842245C422A003C766D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		665AB848245C44A7003C766D /* TimeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTableViewController.swift; sourceTree = "<group>"; };
 		665AB84A245C44B0003C766D /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		66E1DABE24628D2100BF5626 /* EditAddScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAddScheduleViewController.swift; sourceTree = "<group>"; };
 		6D13D483D4F53B9D8A6CCF61 /* Pods_Comuse.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Comuse.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D07E046CB37576AFA9DA6FB3 /* Pods-Comuse.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Comuse.release.xcconfig"; path = "Target Support Files/Pods-Comuse/Pods-Comuse.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -110,6 +112,7 @@
 				665AB84A245C44B0003C766D /* SettingsViewController.swift */,
 				665630C2245C5AE400A50100 /* MembersTableViewController.swift */,
 				660E5BFC245D3312007154A1 /* GoogleSignInViewController.swift */,
+				66E1DABE24628D2100BF5626 /* EditAddScheduleViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				665630BD245C4F6200A50100 /* Schedule.swift in Sources */,
 				665AB837245C422A003C766D /* SceneDelegate.swift in Sources */,
 				660E5BFB245D2E6F007154A1 /* FirebaseVar.swift in Sources */,
+				66E1DABF24628D2100BF5626 /* EditAddScheduleViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

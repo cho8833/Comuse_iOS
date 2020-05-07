@@ -24,6 +24,10 @@ struct Time: Mappable {
         self.hour<-map["hour"]
         self.minute<-map["minute"]
     }
+    init(hour: Int, minute: Int) {
+        self.hour = hour
+        self.minute = minute
+    }
 }
 func == (lhs: Time, rhs: Time) -> Bool {
     return (lhs.hour == rhs.hour && lhs.minute == rhs.minute)

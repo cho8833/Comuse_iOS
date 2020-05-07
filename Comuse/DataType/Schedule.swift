@@ -67,9 +67,9 @@ extension Schedule {
                         }
                         if (diff.type == .removed) {
                             if let removed = Schedule(JSON: diff.document.data()) {
-                                if let indexOfElement = schedules.firstIndex(where:{ self.compareSchedule(s1: removed, s2: $0) }) {
+                                if let indexOfElement = schedules.firstIndex(where:{ self.isEqualSchedule(s1: removed, s2: $0) }) {
                                     schedules.remove(at: indexOfElement)
-                                    let id = String(format: "%02d", removed.startTime.hour) + String(format: "%02d", removed.startTime.minute) + String(format: "%02d", removed.endTime.hour) + String(format: "%02d", removed.endTime.minute) + String(removed.day)
+                                    let id = getDocumentID(schedule: removed)
                                     removeFunc(id)
                                 }
                             }
@@ -80,14 +80,62 @@ extension Schedule {
             }
         }
     }
-    public static func compareSchedule(s1: Schedule, s2: Schedule) -> Bool {
+}
+//MARK: MyScheduleControl
+extension Schedule {
+    public static func addSchedule(schedule: Schedule) -> Bool {
+        if let _ = FirebaseVar.user {
+            if let db = FirebaseVar.db {
+                if checkSchedule(schedule: schedule) == true {
+                    let json = Mapper().toJSON(schedule)
+                    let documentID = getDocumentID(schedule: schedule)
+                    db.collection("TimeTable").document(documentID)
+                        .setData(json)
+                    return true
+                }
+            }
+        }
+        return false
+    }
+    public static func removeSchedule(documentID: String) -> Bool {
+        if let _ = FirebaseVar.user {
+            if let db = FirebaseVar.db {
+                db.collection("TimeTable").document(documentID)
+                .delete()
+                return true
+            }
+        }
+        return false
+    }
+}
+//MARK: Privates
+extension Schedule {
+    public static func getDocumentID(schedule: Schedule) -> String {
+        let document_part1 = String(format: "%02d", schedule.startTime.hour) + String(format: "%02d", schedule.startTime.minute)
+        let document_part2 = String(format: "%02d", schedule.endTime.hour) + String(format: "%02d", schedule.endTime.minute) + String(schedule.day)
+        
+        return document_part1 + document_part2
+    }
+    public static func isEqualSchedule(s1: Schedule, s2: Schedule) -> Bool {
         if(s1.classTitle==s2.classTitle && s1.day==s2.day && s1.startTime==s2.startTime && s1.endTime==s2.endTime) {
             return true
         } else { return false }
     }
+    public static func checkSchedule(schedule: Schedule) -> Bool {
+        if schedule.endTime == schedule.startTime {
+            return false
+        }
+        for compare in Schedule.schedules {
+            if compare.day == schedule.day {
+                if (compare.startTime.hour==schedule.endTime.hour && compare.startTime.minute > schedule.endTime.hour) || compare.startTime.hour > schedule.endTime.hour {
+                    return false
+                }
+                if compare.endTime.hour==schedule.endTime.minute && compare.endTime.minute < schedule.startTime.minute ||
+                compare.endTime.hour < schedule.startTime.hour {
+                    return false
+                }
+            }
+        }
+        return true
+    }
 }
-//MARK: -MyScheduleControl
-extension Schedule {
-    
-}
-

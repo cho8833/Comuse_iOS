@@ -21,20 +21,40 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
         timeTable.dataSource = self
         timeTable.roundCorner = .none
         timeTable.borderColor = UIColor(red: 0.85, green: 0.85, blue: 0.85, alpha: 0.1)
+        timeTable.borderWidth = 1
         // Do any additional setup after loading the view.
         Schedule.getSchedules(reload: timeTable.reloadData, addFunc: addCourse, removeFunc: removeCourse)
     }
     
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
+    /*
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
-    }
-    */
+        if segue.identifier == "editSegue" {
+            if let sender: ElliottEvent = sender as? ElliottEvent {
+                guard let nextViewController: EditAddScheduleViewController = segue.destination as? EditAddScheduleViewController else {
+                    return
+                }
+                nextViewController.selectedDay = sender.courseDay.rawValue
+                //nextViewController.dayPicker.selectRow(sender.courseDay.rawValue, inComponent: 0, animated: true)
+                nextViewController.confirmButton.setTitle("Edit", for: .normal)
+                nextViewController.titleTextField.text = sender.courseName
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "HH:mm"
+                let dateStart = dateFormatter.date(from: sender.startTime)
+                let dateEnd = dateFormatter.date(from: sender.endTime)
+                nextViewController.startTimePicker.setDate(dateStart!, animated: true)
+                nextViewController.endTimePicker.setDate(dateEnd!, animated: true)
+                
+            }
+        }
+    }*/
+
+    
 
 }
 //MARK: -DataSource Methods
@@ -76,8 +96,12 @@ extension TimeTableViewController {
         if let user = FirebaseVar.user {
             if selectedCourse.professor == user.uid {
                 let alert = UIAlertController(title: nil, message: "Manage Schedule", preferredStyle: .actionSheet)
-                let editAction = UIAlertAction(title: "Edit", style: .default, handler: nil)
-                let removeAction = UIAlertAction(title: "Remove", style: .default, handler: nil)
+                let editAction = UIAlertAction(title: "Edit", style: .default) { (action) in
+                    self.performSegue(withIdentifier: "editSegue", sender: selectedCourse)
+                }
+                let removeAction = UIAlertAction(title: "Remove", style: .default) { (action) in
+                    Schedule.removeSchedule(documentID: selectedCourse.courseId)
+                }
                 let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
                 alert.addAction(editAction)
                 alert.addAction(removeAction)
