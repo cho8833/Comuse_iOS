@@ -13,23 +13,20 @@ class MembersTableViewController: UITableViewController {
     @IBOutlet weak var updateInoutButton: UIBarButtonItem!
     @IBAction func udpateInout(_ sender: UIBarButtonItem) {
         if updateInoutButton.title == "out" {
-            Member.updateInout(inoutStatus: true, completion: changeTitle)
+            Member.updateInout(inoutStatus: true, completion: updateUI)
         } else {
-            Member.updateInout(inoutStatus: false, completion: changeTitle)
+            Member.updateInout(inoutStatus: false, completion: updateUI)
         }
     }
-    func changeTitle(title: String) -> Void {
-        updateInoutButton.title = title
-    }
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         Member.getMembers(reload: self.tableView.reloadData)
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        Member.getMyMemberData() {
+            self.updateInoutStatus()
+        }
+        self.configureRefreshControl()
     }
 
     // MARK: - Table view data source
@@ -56,49 +53,31 @@ class MembersTableViewController: UITableViewController {
         return cell
     }
 
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+
+}
+//MARK: - Refresh Control
+extension MembersTableViewController {
+    private func configureRefreshControl() {
+        self.refreshControl = UIRefreshControl()
+        
+        self.refreshControl?.addTarget(self, action: #selector(updateUI), for: .valueChanged)
     }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+    @objc private func updateInoutStatus() {
+        if let myData = Member.me {
+            if myData.inoutStatus == true {
+                self.updateInoutButton.title = "in"
+            } else {
+                self.updateInoutButton.title = "out"
+            }
+        }
     }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
+    @objc private func updateUI() {
+        Member.getMyMemberData {
+            self.updateInoutStatus()
+        }
+        Member.getMembers {
+            self.tableView.reloadData()
+            self.tableView.refreshControl?.endRefreshing()
+        }
     }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

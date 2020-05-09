@@ -53,7 +53,7 @@ extension Schedule {
     public static func getSchedules(reload:@escaping () -> Void, addFunc:@escaping (Schedule) -> Void, removeFunc:@escaping (String) -> Void) -> Void {
         if let _ = FirebaseVar.user {
             if let db = FirebaseVar.db {
-                db.collection("TimeTable").addSnapshotListener { querySnapshot, error in
+                FirebaseVar.scheduleListener = db.collection("TimeTable").addSnapshotListener { querySnapshot, error in
                     guard let snapshot = querySnapshot else {
                         print("Error fetching snapshots: \(error!)")
                         return

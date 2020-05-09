@@ -28,14 +28,13 @@ class EditAddScheduleViewController: UIViewController, UIPickerViewDelegate, UIP
             let calendar = Calendar(identifier: .gregorian)
             let selectedHour_start = calendar.component(.hour, from: startTimePicker.date)
             let selectedMinute_start = calendar.component(.minute, from: startTimePicker.date)
-            self.startTime.hour = selectedHour_start
-            self.startTime.minute = selectedMinute_start
             let selectedHour_end = calendar.component(.hour, from: endTimePicker.date)
             let selectedMinute_end = calendar.component(.minute, from: endTimePicker.date)
-            self.endTime.hour = selectedHour_end
-            self.endTime.minute = selectedMinute_end
             
-            let schedule = Schedule(day: selectedDay, startTime: startTime, endTime: endTime, classPlace: "", professorName: user.uid, classTitle: classTitle)
+            let startTimeObject = Time(hour: selectedHour_start, minute: selectedMinute_start)
+            let endTimeObject = Time(hour: selectedHour_end, minute: selectedMinute_end)
+            
+            let schedule = Schedule(day: selectedDay, startTime: startTimeObject, endTime: endTimeObject, classPlace: "", professorName: user.uid, classTitle: classTitle)
             
             if Schedule.addSchedule(schedule: schedule) == false {
                 self.showAlert(message: "Wrong Schedule", control: nil)
@@ -46,9 +45,9 @@ class EditAddScheduleViewController: UIViewController, UIPickerViewDelegate, UIP
     }
     private let days: [String] = ["MON","TUE","WED","THU","FRI","SAT","SUN"]
     public var selectedDay: Int = 0
-    private var startTime: Time = Time(hour: 0, minute: 0)
-    private var endTime: Time = Time(hour: 0, minute: 0)
-    private var classTitle: String? = nil
+    public var startTime: String? = "00:00"
+    public var endTime: String? = "00:00"
+    public var classTitle: String? = nil
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -58,6 +57,35 @@ class EditAddScheduleViewController: UIViewController, UIPickerViewDelegate, UIP
         
         timePickerSettings(timePicker: startTimePicker)
         timePickerSettings(timePicker: endTimePicker)
+        dayPicker.selectRow(selectedDay-1, inComponent: 0, animated: true)
+        if let title = classTitle {
+            titleTextField.text = title
+        }
+        if let startTime = self.startTime {
+            if let endTime = self.endTime {
+                let startHour = Int(startTime.split(separator: ":")[0])!
+                let startMinute = Int(startTime.split(separator: ":")[1])!
+                let endHour = Int(endTime.split(separator: ":")[0])!
+                let endMinute = Int(endTime.split(separator: ":")[1])!
+                
+                let current: NSDate = NSDate()
+                let gregorian: NSCalendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
+                
+                let components: NSDateComponents = gregorian.components(([.day, .month, .year]), from: current as Date) as NSDateComponents
+                components.hour = startHour
+                components.minute = startMinute
+                components.second = 0
+                let startDate: NSDate = gregorian.date(from: components as DateComponents)! as NSDate
+                
+                components.hour = endHour
+                components.minute = endMinute
+                components.second = 0
+                let endDate: NSDate = gregorian.date(from: components as DateComponents)! as NSDate
+                startTimePicker.setDate(startDate as Date, animated: true)
+                endTimePicker.setDate(endDate as Date, animated: true)
+            }
+        }
+        
     }
     
 
@@ -96,10 +124,10 @@ extension EditAddScheduleViewController {
         // set Maximum, minimum time
         let startHour: Int = 9
         let endHour: Int = 23
-        let date1: NSDate = NSDate()
+        let current: NSDate = NSDate()
         let gregorian: NSCalendar = NSCalendar(calendarIdentifier: NSCalendar.Identifier.gregorian)!
         
-        let components: NSDateComponents = gregorian.components(([.day, .month, .year]), from: date1 as Date) as NSDateComponents
+        let components: NSDateComponents = gregorian.components(([.day, .month, .year]), from: current as Date) as NSDateComponents
         components.hour = startHour
         components.minute = 0
         components.second = 0

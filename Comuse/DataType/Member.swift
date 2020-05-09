@@ -8,6 +8,7 @@
 
 import UIKit
 import ObjectMapper
+import FirebaseFirestore
 struct Member {
     //MARK:- properties
     var name: String
@@ -42,7 +43,6 @@ extension Member: Mappable {
 //MARK: - MyMemberDataControl
 extension Member {
     public static var me: Member?
-    // MARK: - Control myMemberData Methods
     public static func addMemberData() -> Void {
         if let user = FirebaseVar.user {
             if let db = FirebaseVar.db {
@@ -54,8 +54,17 @@ extension Member {
                             "position": nil,
                             "uid": user.uid
                     ]) { error in
-                        return
+                        if let error = error {
+                            print("Error adding document: \(error)")
+                        } else {
+                            if let user = FirebaseVar.user {
+                                let memberData = Member(name: user.displayName! , inoutStatus: false, position: nil, uid: user.uid)
+                                self.me = memberData
+                                self.storeData(value: memberData, key: nil)
+                            }
+                        }
                 }
+                
             }
         }
     }
@@ -68,12 +77,14 @@ extension Member {
                             print("Error removing document: \(error)")
                         } else {
                             //Success removing member data
+                            self.removeStoredData(value: self.me, key: nil)
+                            self.me = nil
                         }
                 }
             }
         }
     }
-    public static func updateInout(inoutStatus: Bool, completion: @escaping(String) -> Void) -> Void {
+    public static func updateInout(inoutStatus: Bool, completion: @escaping() -> Void) -> Void {
         if let user = FirebaseVar.user {
             if let db = FirebaseVar.db {
                 db.collection("Members").document(user.uid)
@@ -83,26 +94,55 @@ extension Member {
                         if let err = err {
                             print("Error updateing inoutStatus: \(err)")
                         } else {
+                            
                             if(inoutStatus == true) {
-                                completion("in")
+                                self.updateStoredData(value: true, key: "inoutStatus")
+                                completion()
                             } else {
-                                completion("out")
+                                self.updateStoredData(value: false, key: "inoutStatus")
+                                completion()
                             }
                         }
                 }
             }
         }
     }
-    public static func getMyMemberData() -> Void {
+    public static func getMyMemberData(completion:@escaping () -> Void) -> Void {
+        if let myData = self.getMyStoredData() {
+            self.me = myData
+            completion()
+        }
+        else {
+            if let user = FirebaseVar.user {
+                if let db = FirebaseVar.db {
+                    db.collection("Members").document(user.uid)
+                        .getDocument() { (document, error) in
+                            if let document = document {
+                                // save me data in me(Member)
+                                if let member = Member(JSON: document.data()!) {
+                                    self.me = member
+                                    self.storeData(value: member, key: nil)
+                                    completion()
+                                }
+                            }
+                    }
+                }
+            }
+        }
+        
+    }
+    public static func editPosition(position: String, completion:@escaping ()-> Void) -> Void {
         if let user = FirebaseVar.user {
             if let db = FirebaseVar.db {
                 db.collection("Members").document(user.uid)
-                    .getDocument() { (document, error) in
-                        if let document = document {
-                            // save me data in me(Member)
-                            if let member = Member(JSON: document.data()!) {
-                                self.me = member
-                            }
+                    .updateData(["position": position]) { error in
+                        if let error = error {
+                            print("error update position: \(error)")
+                        } else {
+                            self.me?.position = position
+                            self.updateStoredData(value: position, key: "position")
+                            
+                            completion()
                         }
                 }
             }
@@ -116,7 +156,7 @@ extension Member {
     public static func getMembers(reload:@escaping () -> Void) -> Void {
         if let _ = FirebaseVar.user {
             if let db = FirebaseVar.db {
-                db.collection("Members")
+                FirebaseVar.memberListener = db.collection("Members")
                 .addSnapshotListener { querySnapshot, error in
                     guard let snapshot = querySnapshot else {
                         print("Error fetching snapshots: \(error!)")
@@ -127,7 +167,6 @@ extension Member {
                             if let member = Member(JSON: diff.document.data()) {
                                 self.members.append(member)
                                 
-                                //notify tableView
                             }
                         }
                         if (diff.type == .modified) {
@@ -135,7 +174,7 @@ extension Member {
                                 if let index = members.firstIndex(where: { $0.uid == modified.uid}) {
                                     members.remove(at: index)
                                     members.insert(modified, at: index)
-                                    // notify tableView
+                                    
                                 }
                             }
                         }
@@ -143,15 +182,56 @@ extension Member {
                             if let removed = Member(JSON: diff.document.data()) {
                                 if let indexOfElement = members.firstIndex(where: { $0.uid == removed.uid }) {
                                     members.remove(at: indexOfElement)
-                                    //notify tableView
+                                    
                                 }
                             }
                         }
                     }
                     reload()
                 }
+                
+            }
+            
+        }
+    
+    }
+    
+}
+//MARK: -Privates
+extension Member {
+    public static func storeData(value: Any, key: String?) -> Void {
+        if let memberData = value as? Member {
+            UserDefaults.standard.set(memberData.name, forKey: "name")
+            if let position = memberData.position {
+                UserDefaults.standard.set(position, forKey: "position")
+            }
+            UserDefaults.standard.set(memberData.uid, forKey: "uid")
+            UserDefaults.standard.set(memberData.inoutStatus, forKey: "inoutStatus")
+        } else {
+            if let forKey = key {
+                UserDefaults.standard.set(value, forKey: forKey)
+            }
+        }
+        
+    }
+    public static func updateStoredData(value: Any?, key: String) -> Void {
+        UserDefaults.standard.set(value, forKey: key)
+    }
+    public static func removeStoredData(value: Any?, key: String?) -> Void {
+        if let _ = value as? Member {
+            UserDefaults.standard.removeObject(forKey: "name")
+            UserDefaults.standard.removeObject(forKey: "position")
+            UserDefaults.standard.removeObject(forKey: "uid")
+            UserDefaults.standard.removeObject(forKey: "inoutStatus")
+        } else {
+            if let forKey = key {
+                UserDefaults.standard.removeObject(forKey: forKey)
             }
         }
     }
+    public static func getMyStoredData() -> Member? {
+        if let name = UserDefaults.standard.string(forKey: "name"), let uid = UserDefaults.standard.string(forKey: "uid") {
+            return Member(name: name, inoutStatus: UserDefaults.standard.bool(forKey: "inoutStatus"), position: UserDefaults.standard.string(forKey: "position"), uid: uid)
+        } else { return nil }
+    }
 }
-

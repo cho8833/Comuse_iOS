@@ -14,6 +14,8 @@ import ObjectMapper
 struct FirebaseVar {
     public static var user: User?
     public static var db: Firestore?
+    public static var memberListener: ListenerRegistration?
+    public static var scheduleListener: ListenerRegistration?
 }
 //MARK: save as [String:Any?]
 extension DocumentReference {

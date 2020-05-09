@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		65D935D4FBC8D68420C6CD6D /* Pods_Comuse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D13D483D4F53B9D8A6CCF61 /* Pods_Comuse.framework */; };
 		660E5BFB245D2E6F007154A1 /* FirebaseVar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660E5BFA245D2E6F007154A1 /* FirebaseVar.swift */; };
-		660E5BFD245D3312007154A1 /* GoogleSignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660E5BFC245D3312007154A1 /* GoogleSignInViewController.swift */; };
+		661E24A7246511920028AE6A /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661E24A6246511920028AE6A /* SignInViewController.swift */; };
 		665630BB245C4F5800A50100 /* Member.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665630BA245C4F5800A50100 /* Member.swift */; };
 		665630BD245C4F6200A50100 /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665630BC245C4F6200A50100 /* Schedule.swift */; };
 		665630BF245C512200A50100 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 665630BE245C512200A50100 /* GoogleService-Info.plist */; };
@@ -28,7 +28,7 @@
 /* Begin PBXFileReference section */
 		1365BD6E4D2CE6FC6A99D7E2 /* Pods-Comuse.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Comuse.debug.xcconfig"; path = "Target Support Files/Pods-Comuse/Pods-Comuse.debug.xcconfig"; sourceTree = "<group>"; };
 		660E5BFA245D2E6F007154A1 /* FirebaseVar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseVar.swift; sourceTree = "<group>"; };
-		660E5BFC245D3312007154A1 /* GoogleSignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInViewController.swift; sourceTree = "<group>"; };
+		661E24A6246511920028AE6A /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
 		665630BA245C4F5800A50100 /* Member.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Member.swift; sourceTree = "<group>"; };
 		665630BC245C4F6200A50100 /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		665630BE245C512200A50100 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -111,8 +111,8 @@
 				665AB848245C44A7003C766D /* TimeTableViewController.swift */,
 				665AB84A245C44B0003C766D /* SettingsViewController.swift */,
 				665630C2245C5AE400A50100 /* MembersTableViewController.swift */,
-				660E5BFC245D3312007154A1 /* GoogleSignInViewController.swift */,
 				66E1DABE24628D2100BF5626 /* EditAddScheduleViewController.swift */,
+				661E24A6246511920028AE6A /* SignInViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -274,8 +274,8 @@
 				665AB849245C44A7003C766D /* TimeTableViewController.swift in Sources */,
 				665630C1245C565200A50100 /* Time.swift in Sources */,
 				665AB84B245C44B0003C766D /* SettingsViewController.swift in Sources */,
-				660E5BFD245D3312007154A1 /* GoogleSignInViewController.swift in Sources */,
 				665630BD245C4F6200A50100 /* Schedule.swift in Sources */,
+				661E24A7246511920028AE6A /* SignInViewController.swift in Sources */,
 				665AB837245C422A003C766D /* SceneDelegate.swift in Sources */,
 				660E5BFB245D2E6F007154A1 /* FirebaseVar.swift in Sources */,
 				66E1DABF24628D2100BF5626 /* EditAddScheduleViewController.swift in Sources */,

@@ -14,7 +14,9 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
     @IBOutlet weak var timeTable: Elliotable!
     private let day = ["MON","TUE","WED","THU","FRI","SAT","SUN"]
     private var items: [ElliottEvent] = []
-
+    private let backgroundColors = [ 0xecc369, 0xa7ca70, 0x7dd1c1, 0x7aa5e9, 0xfbaa68, 0x9f86e1, 0x78cb87, 0xd397ed ]
+    private var colorIndex: Int = 0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         timeTable.delegate = self
@@ -24,13 +26,14 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
         timeTable.borderWidth = 1
         // Do any additional setup after loading the view.
         Schedule.getSchedules(reload: timeTable.reloadData, addFunc: addCourse, removeFunc: removeCourse)
+        
     }
     
 
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    /*
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
@@ -40,19 +43,14 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
                     return
                 }
                 nextViewController.selectedDay = sender.courseDay.rawValue
-                //nextViewController.dayPicker.selectRow(sender.courseDay.rawValue, inComponent: 0, animated: true)
-                nextViewController.confirmButton.setTitle("Edit", for: .normal)
-                nextViewController.titleTextField.text = sender.courseName
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "HH:mm"
-                let dateStart = dateFormatter.date(from: sender.startTime)
-                let dateEnd = dateFormatter.date(from: sender.endTime)
-                nextViewController.startTimePicker.setDate(dateStart!, animated: true)
-                nextViewController.endTimePicker.setDate(dateEnd!, animated: true)
+                nextViewController.classTitle = sender.courseName
+                nextViewController.startTime = sender.startTime
+                nextViewController.endTime = sender.endTime
+                
                 
             }
         }
-    }*/
+    }
 
     
 
@@ -79,7 +77,7 @@ extension TimeTableViewController {
         let endTime = endTimeHour + ":" + endTimeMinute
         let id = startTimeHour + startTimeMinute + endTimeHour + endTimeMinute + String(schedule.day)
         if let rawDay = ElliotDay(rawValue: schedule.day+1) {
-            let course = ElliottEvent(courseId: id, courseName: schedule.classTitle, roomName: "", professor: schedule.professorName, courseDay: rawDay, startTime: startTime, endTime: endTime, backgroundColor: UIColor(displayP3Red: 0.1, green: 0.1, blue: 0.1, alpha: 1.0))
+            let course = ElliottEvent(courseId: id, courseName: schedule.classTitle, roomName: "", professor: schedule.professorName, courseDay: rawDay, startTime: startTime, endTime: endTime, backgroundColor: getBackgroundColor())
             items.append(course)
         }
         
@@ -117,4 +115,21 @@ extension TimeTableViewController {
         return
     }
 }
-
+//MARK: Privates
+extension TimeTableViewController {
+    private func getBackgroundColor() -> UIColor {
+        if self.colorIndex == backgroundColors.count {
+            colorIndex = 0
+        } else { colorIndex += 1}
+        return UIColor.colorWithRGBHex(hex: backgroundColors[colorIndex])
+    }
+}
+extension UIColor {
+    class func colorWithRGBHex(hex: Int, alpha: Float = 1.0) -> UIColor {
+        let r = Float((hex >> 16) & 0xFF)
+        let g = Float((hex >> 8) & 0xFF)
+        let b = Float((hex) & 0xFF)
+        
+        return UIColor(red: CGFloat(r / 255.0), green: CGFloat(g / 255.0), blue:CGFloat(b / 255.0), alpha: CGFloat(alpha))
+    }
+}
