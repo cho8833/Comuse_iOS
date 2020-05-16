@@ -17,53 +17,64 @@ class SettingsViewController: UITableViewController {
     @IBOutlet weak var positionLabel: UILabel!
     
     @IBAction func touchUpEditPosition(_ sender: UIButton) {
-        let alert = UIAlertController(title: "Edit Position", message: "Input Position", preferredStyle: .alert)
-        let ok = UIAlertAction(title: "OK", style: .default) { (ok) in
-            if let position = alert.textFields?[0].text {
-                Member.editPosition(position: position) { () in
-                    self.positionLabel.text = position
-                    Member.me?.position = position
+        if let _ = FirebaseVar.user {
+            let alert = UIAlertController(title: "Edit Position", message: "Input Position", preferredStyle: .alert)
+            let ok = UIAlertAction(title: "OK", style: .default) { (ok) in
+                if let position = alert.textFields?[0].text {
+                    Member.editPosition(position: position) { () in
+                        self.positionLabel.text = position
+                        Member.me?.position = position
+                    }
                 }
             }
+            let cancel = UIAlertAction(title: "cancel", style: .cancel) { (cancel) in
+                alert.dismiss(animated: true, completion: nil)
+            }
+            alert.addTextField()
+            
+            alert.addAction(cancel)
+            alert.addAction(ok)
+            self.present(alert, animated: true, completion: nil)
         }
-        let cancel = UIAlertAction(title: "cancel", style: .cancel) { (cancel) in
-            alert.dismiss(animated: true, completion: nil)
-        }
-        alert.addTextField()
-
-        alert.addAction(cancel)
-        alert.addAction(ok)
-        self.present(alert, animated: true, completion: nil)
 
     }
     @IBAction func touchUpSignIn_Out(_ sender: UIButton) {
         if let user = FirebaseVar.user {
-            let firebaseAuth = Auth.auth()
-            do {
-                try firebaseAuth.signOut()
-                user.delete { error in
-                    if let error = error {
-                        print("delete user error: \(error)")
-                    } else {
-                        Member.removeMemberData()
-                        Member.removeStoredData(value: Member.me, key: nil)
-                        Member.me = nil
-                        Member.members.removeAll()
-                        Schedule.schedules.removeAll()
-                        FirebaseVar.memberListener?.remove()
-                        FirebaseVar.scheduleListener?.remove()
-                        FirebaseVar.user = nil
-                        FirebaseVar.db = nil
-                        self.updateUI()
+            user.delete { error in
+                if let error = error {
+                    //error occured
+                    print(error.localizedDescription)
+                    let alert = UIAlertController(title: "Delete Account", message: "Input password", preferredStyle: .alert)
+                    let okAction = UIAlertAction(title: "OK", style: .default) { ok in
+                        if let pwd = alert.textFields?[0].text {
+                            let credential: AuthCredential = EmailAuthProvider.credential(withEmail: (FirebaseVar.user?.email)!, password: pwd)
+                            FirebaseVar.user?.reauthenticate(with: credential) { authDataResult, error in
+                                if let error = error {
+                                    // error occuered when reauthenticating
+                                    self.generateSimpleAlert(message: error.localizedDescription)
+                                } else {
+                                    // deleting user complete
+                                    FirebaseVar.user?.delete()
+                                    FirebaseVar.memberListener?.remove()
+                                    FirebaseVar.scheduleListener?.remove()
+                                    Member.removeStoredData(value: Member.me, key: nil)
+                                }
+                            }
+                        }
                     }
+                    let cancel = UIAlertAction(title: "Cancel", style: .cancel) { cancel in
+                        alert.dismiss(animated: true, completion: nil)
+                    }
+                    alert.addAction(okAction)
+                    alert.addAction(cancel)
+                    alert.addTextField()
+                    self.present(alert, animated: true, completion: nil)
+                } else {
+                    // deleting user complete
                 }
-            } catch let signOutError as NSError {
-                print ("Error signing out: %@", signOutError)
             }
-
         } else {
             performSegue(withIdentifier: "signInSegue", sender: nil)
-            
         }
     }
     
@@ -106,5 +117,13 @@ class SettingsViewController: UITableViewController {
             positionLabel.text = "nil"
         }
         self.refreshControl?.endRefreshing()
+    }
+    private func generateSimpleAlert(message: String) -> Void {
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default) { ok in
+            alert.dismiss(animated: true, completion: nil)
+        }
+        alert.addAction(okAction)
+        self.present(alert, animated: true, completion: nil)
     }
 }

@@ -17,7 +17,7 @@ class SignInViewController: UIViewController, GIDSignInDelegate {
           if (error as NSError).code == GIDSignInErrorCode.hasNoAuthInKeychain.rawValue {
             print("The user has not signed in before or they have since signed out.")
           } else {
-            print("\(error.localizedDescription)")
+            generateSimpleAlert(message: error.localizedDescription)
           }
           return
         } else {
@@ -27,7 +27,7 @@ class SignInViewController: UIViewController, GIDSignInDelegate {
                                                               accessToken: authentication.accessToken)
             FirebaseAuth.Auth.auth().signIn(with: credential, completion: {(data, error) in
                 if let error = error {
-                    print(error.localizedDescription)
+                    self.generateSimpleAlert(message: error.localizedDescription)
                 } else {
                     FirebaseVar.db = Firestore.firestore()
                     FirebaseVar.user = Auth.auth().currentUser
@@ -45,7 +45,14 @@ class SignInViewController: UIViewController, GIDSignInDelegate {
         GIDSignIn.sharedInstance()?.presentingViewController = self
         
     }
-    
+    private func generateSimpleAlert(message: String) -> Void {
+        let alert = UIAlertController(title: "Alert", message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default) { ok in
+            alert.dismiss(animated: true, completion: nil)
+        }
+        alert.addAction(okAction)
+        self.present(alert, animated: true, completion: nil)
+    }
 
     /*
     // MARK: - Navigation

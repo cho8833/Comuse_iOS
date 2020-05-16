@@ -96,9 +96,11 @@ extension Member {
                         } else {
                             
                             if(inoutStatus == true) {
+                                self.me?.inoutStatus = true
                                 self.updateStoredData(value: true, key: "inoutStatus")
                                 completion()
                             } else {
+                                self.me?.inoutStatus = false
                                 self.updateStoredData(value: false, key: "inoutStatus")
                                 completion()
                             }
@@ -124,6 +126,10 @@ extension Member {
                                     self.storeData(value: member, key: nil)
                                     completion()
                                 }
+                            } else {
+                                //get func success, but document = nil
+                                //case: no user's member data in server
+                                self.addMemberData()
                             }
                     }
                 }
@@ -189,13 +195,9 @@ extension Member {
                     }
                     reload()
                 }
-                
             }
-            
         }
-    
     }
-    
 }
 //MARK: -Privates
 extension Member {

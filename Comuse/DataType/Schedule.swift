@@ -8,6 +8,8 @@
 
 import UIKit
 import ObjectMapper
+import RxCocoa
+import RxSwift
 
 struct Schedule {
     var day: Int
@@ -62,6 +64,8 @@ extension Schedule {
                         if (diff.type == .added) {
                             if let added = Schedule(JSON: diff.document.data()) {
                                 schedules.append(added)
+                                
+                                
                                 addFunc(added)
                             }
                         }
@@ -86,13 +90,11 @@ extension Schedule {
     public static func addSchedule(schedule: Schedule) -> Bool {
         if let _ = FirebaseVar.user {
             if let db = FirebaseVar.db {
-                if checkSchedule(schedule: schedule) == true {
                     let json = Mapper().toJSON(schedule)
                     let documentID = getDocumentID(schedule: schedule)
                     db.collection("TimeTable").document(documentID)
                         .setData(json)
                     return true
-                }
             }
         }
         return false
@@ -121,21 +123,5 @@ extension Schedule {
             return true
         } else { return false }
     }
-    public static func checkSchedule(schedule: Schedule) -> Bool {
-        if schedule.endTime == schedule.startTime {
-            return false
-        }
-        for compare in Schedule.schedules {
-            if compare.day == schedule.day {
-                if (compare.startTime.hour==schedule.endTime.hour && compare.startTime.minute > schedule.endTime.hour) || compare.startTime.hour > schedule.endTime.hour {
-                    return false
-                }
-                if compare.endTime.hour==schedule.endTime.minute && compare.endTime.minute < schedule.startTime.minute ||
-                compare.endTime.hour < schedule.startTime.hour {
-                    return false
-                }
-            }
-        }
-        return true
-    }
+    
 }

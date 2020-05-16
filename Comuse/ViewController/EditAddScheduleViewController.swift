@@ -33,7 +33,9 @@ class EditAddScheduleViewController: UIViewController, UIPickerViewDelegate, UIP
             
             let startTimeObject = Time(hour: selectedHour_start, minute: selectedMinute_start)
             let endTimeObject = Time(hour: selectedHour_end, minute: selectedMinute_end)
-            
+            if checkTimeValid(classTitle: classTitle, startTime: startTimeObject, endTime: endTimeObject, day: selectedDay) == false {
+                return
+            }
             let schedule = Schedule(day: selectedDay, startTime: startTimeObject, endTime: endTimeObject, classPlace: "", professorName: user.uid, classTitle: classTitle)
             
             if Schedule.addSchedule(schedule: schedule) == false {
@@ -182,5 +184,26 @@ extension EditAddScheduleViewController {
         alert.addAction(cancel)
         self.present(alert,animated: true)
     }
- 
+    private func checkTimeValid(classTitle: String, startTime: Time, endTime: Time, day: Int) -> Bool {
+        if(classTitle.isEmpty == true) {
+            return false
+        }
+        if ((startTime.hour > endTime.hour) || (startTime.hour == endTime.hour && startTime.minute >= endTime.minute)) {
+            return false
+        }
+        for index in 0..<Schedule.schedules.count {
+            let schedule: Schedule = Schedule.schedules[index]
+            if(schedule.day == day) {
+                if(((schedule.startTime.hour == endTime.hour) && (schedule.startTime.minute < endTime.minute)) ||
+                    ((schedule.endTime.hour == startTime.hour) && (schedule.endTime.minute > startTime.minute))) {
+                    return false
+                }
+                if((schedule.startTime.hour < endTime.hour) || (schedule.endTime.hour > startTime.hour)) {
+                    return false
+                }
+            }
+        }
+        return true
+        
+    }
 }

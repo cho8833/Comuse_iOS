@@ -10,6 +10,9 @@ pod 'Firebase/Firestore'
 pod 'FirebaseFirestoreSwift'
 pod 'GoogleSignIn'
 pod 'ObjectMapper'
+pod 'RxCocoa'
+pod 'RxSwift'
+pod 'Firebase/Analytics'
   # Pods for Comuse
 
 end

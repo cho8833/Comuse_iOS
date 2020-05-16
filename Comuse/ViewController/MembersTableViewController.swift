@@ -7,26 +7,60 @@
 //
 
 import UIKit
+import Firebase
 
 class MembersTableViewController: UITableViewController {
-    
+    let nameLabelTag = 101
+    let positionLabelTag = 102
+    let inoutStatusLabelTag = 103
+    // MARK: -Properties
     @IBOutlet weak var updateInoutButton: UIBarButtonItem!
-    @IBAction func udpateInout(_ sender: UIBarButtonItem) {
-        if updateInoutButton.title == "out" {
-            Member.updateInout(inoutStatus: true, completion: updateUI)
+    @IBAction func touchUpInoutStatusButton(_ sender: UIBarButtonItem) {
+        if Member.me?.inoutStatus == false {
+            Member.updateInout(inoutStatus: true) {
+                if let user = FirebaseVar.user {
+                    Analytics.logEvent("updated_Inout", parameters: [
+                        "MemberName": user.displayName! as NSObject,
+                        "Status": "in" as NSObject
+                    ])
+                }
+                self.updateInoutStatusButton()
+            }
         } else {
-            Member.updateInout(inoutStatus: false, completion: updateUI)
+            Member.updateInout(inoutStatus: false) {
+                if let user = FirebaseVar.user {
+                    Analytics.logEvent("updated_Inout", parameters: [
+                        "MemberName": user.displayName! as NSObject,
+                        "Status": "out" as NSObject
+                    ])
+                }
+                self.updateInoutStatusButton()
+            }
         }
+        
     }
     
-    
+    // MARK: -Life Cycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         Member.getMembers(reload: self.tableView.reloadData)
         Member.getMyMemberData() {
-            self.updateInoutStatus()
+            self.updateInoutStatusButton()
         }
         self.configureRefreshControl()
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        Member.getMyMemberData {
+            self.updateInoutStatusButton()
+        }
+        if FirebaseVar.memberListener == nil {
+            Member.getMembers(reload: tableView.reloadData)
+        }
+    }
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        Member.storeData(value: Member.me as Any, key: nil)
     }
 
     // MARK: - Table view data source
@@ -46,9 +80,16 @@ class MembersTableViewController: UITableViewController {
         guard indexPath.row < Member.members.count else { return cell }
         
         let member: Member = Member.members[indexPath.row]
+        (cell.viewWithTag(nameLabelTag) as! UILabel).text = member.name
+        if let position = member.position {
+            (cell.viewWithTag(positionLabelTag) as! UILabel).text = position
+        } else {
+            (cell.viewWithTag(positionLabelTag) as! UILabel).text = ""
+        }
+        
         cell.textLabel?.text = member.name
-        if member.inoutStatus == true { cell.detailTextLabel?.text = "in" }
-        else { cell.detailTextLabel?.text = "out" }
+        if member.inoutStatus == true { (cell.viewWithTag(inoutStatusLabelTag) as! UILabel).text = "in" }
+        else { (cell.viewWithTag(inoutStatusLabelTag) as! UILabel).text = "out" }
 
         return cell
     }
@@ -60,9 +101,9 @@ extension MembersTableViewController {
     private func configureRefreshControl() {
         self.refreshControl = UIRefreshControl()
         
-        self.refreshControl?.addTarget(self, action: #selector(updateUI), for: .valueChanged)
+        self.refreshControl?.addTarget(self, action: #selector(getData), for: .valueChanged)
     }
-    @objc private func updateInoutStatus() {
+    @objc private func updateInoutStatusButton() {
         if let myData = Member.me {
             if myData.inoutStatus == true {
                 self.updateInoutButton.title = "in"
@@ -71,13 +112,22 @@ extension MembersTableViewController {
             }
         }
     }
-    @objc private func updateUI() {
-        Member.getMyMemberData {
-            self.updateInoutStatus()
+    @objc private func getData() {
+        if Member.me == nil {
+            Member.getMyMemberData {
+                self.updateInoutStatusButton()
+            }
         }
-        Member.getMembers {
-            self.tableView.reloadData()
+        
+        if let _ = FirebaseVar.memberListener {
             self.tableView.refreshControl?.endRefreshing()
         }
+        else {
+            Member.getMembers {
+                self.tableView.reloadData()
+                self.tableView.refreshControl?.endRefreshing()
+            }
+        }
+        
     }
 }

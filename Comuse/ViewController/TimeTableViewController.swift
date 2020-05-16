@@ -24,16 +24,16 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
         timeTable.roundCorner = .none
         timeTable.borderColor = UIColor(red: 0.85, green: 0.85, blue: 0.85, alpha: 0.1)
         timeTable.borderWidth = 1
-        // Do any additional setup after loading the view.
-        Schedule.getSchedules(reload: timeTable.reloadData, addFunc: addCourse, removeFunc: removeCourse)
         
     }
-    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if FirebaseVar.scheduleListener == nil {
+            Schedule.getSchedules(reload: timeTable.reloadData, addFunc: addCourse, removeFunc: removeCourse)
+        }
+    }
 
     // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
@@ -55,7 +55,7 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
     
 
 }
-//MARK: -DataSource Methods
+//MARK: -TimeTable DataSource Methods
 extension TimeTableViewController {
     
     func elliotable(elliotable: Elliotable, at dayPerIndex: Int) -> String {
@@ -66,27 +66,8 @@ extension TimeTableViewController {
         return day.count
     }
 }
-//MARK: -Delegate Methods
+//MARK: -TimeTable Delegate Methods
 extension TimeTableViewController {
-    func addCourse(schedule: Schedule) -> Void {
-        let startTimeHour: String = String(format: "%02d", schedule.startTime.hour)
-        let endTimeHour = String(format: "%02d", schedule.endTime.hour)
-        let startTimeMinute: String = String(format: "%02d", schedule.startTime.minute)
-        let endTimeMinute: String = String(format: "%02d", schedule.endTime.minute)
-        let startTime = startTimeHour + ":" + startTimeMinute
-        let endTime = endTimeHour + ":" + endTimeMinute
-        let id = startTimeHour + startTimeMinute + endTimeHour + endTimeMinute + String(schedule.day)
-        if let rawDay = ElliotDay(rawValue: schedule.day+1) {
-            let course = ElliottEvent(courseId: id, courseName: schedule.classTitle, roomName: "", professor: schedule.professorName, courseDay: rawDay, startTime: startTime, endTime: endTime, backgroundColor: getBackgroundColor())
-            items.append(course)
-        }
-        
-    }
-    func removeCourse(id: String) -> Void {
-        if let removeIndex = items.firstIndex(where: { $0.courseId == id}) {
-            items.remove(at: removeIndex)
-        }
-    }
     func courseItems(in elliotable: Elliotable) -> [ElliottEvent] {
         return items
     }
@@ -110,9 +91,29 @@ extension TimeTableViewController {
         }
         return
     }
-    
     func elliotable(elliotable: Elliotable, didLongSelectCourse longSelectedCourse: ElliottEvent) {
         return
+    }
+}
+// MARK: -TimeTable Control Course Methods
+extension TimeTableViewController {
+    func addCourse(schedule: Schedule) -> Void {
+        let startTimeHour: String = String(format: "%02d", schedule.startTime.hour)
+        let endTimeHour = String(format: "%02d", schedule.endTime.hour)
+        let startTimeMinute: String = String(format: "%02d", schedule.startTime.minute)
+        let endTimeMinute: String = String(format: "%02d", schedule.endTime.minute)
+        let startTime = startTimeHour + ":" + startTimeMinute
+        let endTime = endTimeHour + ":" + endTimeMinute
+        let id = startTimeHour + startTimeMinute + endTimeHour + endTimeMinute + String(schedule.day)
+        if let rawDay = ElliotDay(rawValue: schedule.day+1) {
+            let course = ElliottEvent(courseId: id, courseName: schedule.classTitle, roomName: "", professor: schedule.professorName, courseDay: rawDay, startTime: startTime, endTime: endTime, backgroundColor: getBackgroundColor())
+            items.append(course)
+        }
+    }
+    func removeCourse(id: String) -> Void {
+        if let removeIndex = items.firstIndex(where: { $0.courseId == id}) {
+            items.remove(at: removeIndex)
+        }
     }
 }
 //MARK: Privates
