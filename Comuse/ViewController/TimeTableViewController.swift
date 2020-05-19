@@ -8,7 +8,20 @@
 
 import UIKit
 import Elliotable
-
+/*
+    public struct ElliottEvent {
+        public let courseId  : String           // Database 에 저장될 때의 문서 이름(시작시간|종료시간|요일)이 저장된다.
+        public let courseName: String           // TimeTable 에 생성될 때 표시되는 문자열, Schedule.classTitle
+        public let roomName  : String           // TimeTable 에 생성될 때 courseName 하단에 표시되는 문자열, Schedule.classPlace
+        public let professor : String           // Schedule.professorName
+        public let courseDay : ElliotDay        // Schedule.day
+        public let startTime : String           // Schedule.startTime 을 HH:MM 형식으로 포맷하여 저장한다.
+        public let endTime   : String           // Schedule.endTiem 을 HH:MM 형식으로 포맷하여 저장한다.
+        public let textColor      : UIColor?    // 건들지 않음
+        public let backgroundColor: UIColor     // backgroundColors 의 데이터를 순회하면서 저장한다.
+    
+    TimeTable 에 Schedule 을 생성하려면 Schedule -> ElliiottEvent 작업이 필요하다.
+ */
 class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableDataSource {
 
     @IBOutlet weak var timeTable: Elliotable!
@@ -19,6 +32,7 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //TimeTable Setting
         timeTable.delegate = self
         timeTable.dataSource = self
         timeTable.roundCorner = .none
@@ -28,20 +42,21 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        // Listener 활성화
         if FirebaseVar.scheduleListener == nil {
-            Schedule.getSchedules(reload: timeTable.reloadData, addFunc: addCourse, removeFunc: removeCourse)
+            Schedule.getSchedules(reload: timeTable.reloadData, addToTimeTable: addCourse, removeSchedule: removeCourse)
         }
     }
 
     // MARK: - Navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        // TimeTable 내의 Schedule 을 터치했을 때 Edit Button을 누르면 발생하는 segue
         if segue.identifier == "editSegue" {
             if let sender: ElliottEvent = sender as? ElliottEvent {
                 guard let nextViewController: EditAddScheduleViewController = segue.destination as? EditAddScheduleViewController else {
                     return
                 }
+                // Edit/AddScheduleViewController 의 view 들의 초기 정보를 전달한다.
                 nextViewController.selectedDay = sender.courseDay.rawValue
                 nextViewController.classTitle = sender.courseName
                 nextViewController.startTime = sender.startTime
@@ -71,16 +86,23 @@ extension TimeTableViewController {
     func courseItems(in elliotable: Elliotable) -> [ElliottEvent] {
         return items
     }
+    // onclick
     func elliotable(elliotable: Elliotable, didSelectCourse selectedCourse: ElliottEvent) {
         if let user = FirebaseVar.user {
             if selectedCourse.professor == user.uid {
                 let alert = UIAlertController(title: nil, message: "Manage Schedule", preferredStyle: .actionSheet)
+                
+                // edit button
                 let editAction = UIAlertAction(title: "Edit", style: .default) { (action) in
                     self.performSegue(withIdentifier: "editSegue", sender: selectedCourse)
                 }
+                
+                // remove button
                 let removeAction = UIAlertAction(title: "Remove", style: .default) { (action) in
                     Schedule.removeSchedule(documentID: selectedCourse.courseId)
                 }
+                
+                // cancel button
                 let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
                 alert.addAction(editAction)
                 alert.addAction(removeAction)
@@ -95,7 +117,7 @@ extension TimeTableViewController {
         return
     }
 }
-// MARK: -TimeTable Control Course Methods
+// MARK: -TimeTable Course Control Methods
 extension TimeTableViewController {
     func addCourse(schedule: Schedule) -> Void {
         let startTimeHour: String = String(format: "%02d", schedule.startTime.hour)
@@ -126,6 +148,7 @@ extension TimeTableViewController {
     }
 }
 extension UIColor {
+    // 0x000000 -> UIColor
     class func colorWithRGBHex(hex: Int, alpha: Float = 1.0) -> UIColor {
         let r = Float((hex >> 16) & 0xFF)
         let g = Float((hex >> 8) & 0xFF)

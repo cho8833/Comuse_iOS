@@ -9,17 +9,26 @@
 import UIKit
 import ObjectMapper
 import FirebaseFirestore
+
+/*
+    유저의 정보를 담는 class
+    FireStore/Members Collection 에 저장됨
+ */
+
 struct Member {
     //MARK:- properties
-    var name: String
-    var inoutStatus: Bool
-    var position: String?
-    var uid: String
+    var name: String        // from FirebaseVar,user, can't be nil
+    var inoutStatus: Bool   // addMember 되어 새로운 멤버 데이터가 생성된 경우 초기값은 false 이다.
+    var position: String?   // Setting 에서 유저가 직접 edit 해야한다.
+    var uid: String         // from FirebaseVar.user, can't be nil
     
     
 }
 
 //MARK: - JSON -> Member Methods
+/*
+    FireStore 은 커스텀 객체 저장을 지원하지 않는다. 따라서 JSON 형식으로 바꾼 후 데이터를 전송한다.
+ */
 extension Member: Mappable {
     init?(map: Map) {
         if let name = map.JSON["name"] {
@@ -40,9 +49,55 @@ extension Member: Mappable {
         uid<-map["uid"]
     }
 }
-//MARK: - MyMemberDataControl
+//MARK: - My Member Database Data Control
+/*
+    user 의 Member Data 는 Member 타입의 me 객체에 저장된다. 그리고 FireStore/Members Collection 에 문서 이름은 Member.uid 로 저장된다.
+    me 객체는 데이터 통신의 지연을 없애기 위해 UserDefaults 를 이용하여 Local 에 저장한다.
+    me 객체의 데이터가 변경 되면, FireStore/Members Collection 에 Member.uid 를 이용하여 접근하여 데이터를 변경한다.
+    데이터 변경은 FireStore 의 데이터를 먼저 변경 후 콜백 함수인 completion 이 호출되면 Local 데이터를 변경한다.
+ */
 extension Member {
-    public static var me: Member?
+    public static var me: Member?               // user 의 데이터를 저장하는 객체
+    
+    /*
+        user 의 멤버 데이터는 로컬에 저장되어 먼저 Local 을 검사하여 데이터가 없으면 Database 에서 받아온다.
+        만약 Database 에서 데이터를 받아오면 Local 에 데이터를 새로 덮어쓴다.
+        받아오는 작업이 완료되면 completion 함수를 호출하여 updateUI 한다.
+     */
+    public static func getMyMemberData(completion:@escaping () -> Void) -> Void {
+        if let myData = self.getMyStoredData() {
+            self.me = myData
+            completion()
+        }
+        else {
+            if let user = FirebaseVar.user {
+                if let db = FirebaseVar.db {
+                    db.collection("Members").document(user.uid)
+                        .getDocument() { (document, error) in
+                            if let document = document {
+                                // save me data in me(Member)
+                                if let member = Member(JSON: document.data()!) {
+                                    self.me = member
+                                    self.storeData(value: member, key: nil)
+                                    completion()
+                                } else {
+                                    //get func success, but document.data() = nil
+                                    //case: no user's member data in server
+                                    self.addMemberData()
+                                }
+                            } else {
+                                
+                            }
+                    }
+                }
+            }
+        }
+        
+    }
+    /*
+        FireStore 에 데이터 추가 후 Local 에도 데이터를 저장한다
+        getMemberData 를 호출하였을 때 Database 에 user Data 가 없는 경우 호출된다.
+     */
     public static func addMemberData() -> Void {
         if let user = FirebaseVar.user {
             if let db = FirebaseVar.db {
@@ -68,6 +123,8 @@ extension Member {
             }
         }
     }
+    
+    // FireStore 의 user.uid 문서 이름의 문서를 삭제한다.
     public static func removeMemberData() -> Void {
         if let user = FirebaseVar.user {
             if let db = FirebaseVar.db {
@@ -84,6 +141,11 @@ extension Member {
             }
         }
     }
+    
+    /*
+        FireSotre 의 user.uid 이름을 가진 문서의 inoutStatus 를 변경하고 변경에 성공하면 Local data 도 변경한다.
+        변경이 완료되면 updateUI 가 필요하다.
+     */
     public static func updateInout(inoutStatus: Bool, completion: @escaping() -> Void) -> Void {
         if let user = FirebaseVar.user {
             if let db = FirebaseVar.db {
@@ -109,34 +171,11 @@ extension Member {
             }
         }
     }
-    public static func getMyMemberData(completion:@escaping () -> Void) -> Void {
-        if let myData = self.getMyStoredData() {
-            self.me = myData
-            completion()
-        }
-        else {
-            if let user = FirebaseVar.user {
-                if let db = FirebaseVar.db {
-                    db.collection("Members").document(user.uid)
-                        .getDocument() { (document, error) in
-                            if let document = document {
-                                // save me data in me(Member)
-                                if let member = Member(JSON: document.data()!) {
-                                    self.me = member
-                                    self.storeData(value: member, key: nil)
-                                    completion()
-                                }
-                            } else {
-                                //get func success, but document = nil
-                                //case: no user's member data in server
-                                self.addMemberData()
-                            }
-                    }
-                }
-            }
-        }
-        
-    }
+    
+    /*
+        FireStore 의 user.uid 이름을 가진 문서의 position 을 변경하고 변경에 성공하면 Local data 도 변경한다.
+        변경이 완료되면 updateUI 가 필요하다.
+     */
     public static func editPosition(position: String, completion:@escaping ()-> Void) -> Void {
         if let user = FirebaseVar.user {
             if let db = FirebaseVar.db {
@@ -156,9 +195,13 @@ extension Member {
     }
 }
 //MARK: - Get Members
+/*
+    FireStore/Members Collection 에서 데이터를 실시간(SnapShot Listener)으로 받아온다.
+    데이터는 members 객체에 저장되고 Local 에는 저장하지 않는다.
+    데이터가 변경되어 querySnapshot 이 전달되면 TableView 에 notify 해줘야한다.
+ */
 extension Member {
     public static var members: [Member] = []
-    
     public static func getMembers(reload:@escaping () -> Void) -> Void {
         if let _ = FirebaseVar.user {
             if let db = FirebaseVar.db {
@@ -193,14 +236,18 @@ extension Member {
                             }
                         }
                     }
-                    reload()
+                    reload()            // Notify TableView
                 }
             }
         }
     }
 }
-//MARK: -Privates
+//MARK: - My Member Local Data Control
 extension Member {
+    /*
+        Local 에는 key-value 형식으로 저장된다.
+        Member property 를 모두 저장한다.
+     */
     public static func storeData(value: Any, key: String?) -> Void {
         if let memberData = value as? Member {
             UserDefaults.standard.set(memberData.name, forKey: "name")

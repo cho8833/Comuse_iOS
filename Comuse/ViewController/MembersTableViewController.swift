@@ -58,10 +58,6 @@ class MembersTableViewController: UITableViewController {
             Member.getMembers(reload: tableView.reloadData)
         }
     }
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        Member.storeData(value: Member.me as Any, key: nil)
-    }
 
     // MARK: - Table view data source
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -74,7 +70,7 @@ class MembersTableViewController: UITableViewController {
         return Member.members.count
     }
 
-    
+    // MARK: - Table view delegate
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "memberCell", for: indexPath)
         guard indexPath.row < Member.members.count else { return cell }

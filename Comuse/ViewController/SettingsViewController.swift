@@ -16,9 +16,13 @@ class SettingsViewController: UITableViewController {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var positionLabel: UILabel!
     
+    /*
+        position edit button 을 누르면 Position 을 입력하는 textField 를 가진 Alert 가 발생한다.
+     */
     @IBAction func touchUpEditPosition(_ sender: UIButton) {
         if let _ = FirebaseVar.user {
             let alert = UIAlertController(title: "Edit Position", message: "Input Position", preferredStyle: .alert)
+            // ok button
             let ok = UIAlertAction(title: "OK", style: .default) { (ok) in
                 if let position = alert.textFields?[0].text {
                     Member.editPosition(position: position) { () in
@@ -27,6 +31,7 @@ class SettingsViewController: UITableViewController {
                     }
                 }
             }
+            // cancel button
             let cancel = UIAlertAction(title: "cancel", style: .cancel) { (cancel) in
                 alert.dismiss(animated: true, completion: nil)
             }
@@ -36,14 +41,18 @@ class SettingsViewController: UITableViewController {
             alert.addAction(ok)
             self.present(alert, animated: true, completion: nil)
         }
-
     }
     @IBAction func touchUpSignIn_Out(_ sender: UIButton) {
+        // user 의 nil 여부로 로그인 여부를 검사한다.
         if let user = FirebaseVar.user {
+            // sign out
             user.delete { error in
                 if let error = error {
-                    //error occured
+                    // error occured
+                    // case: require reauthenticate
                     print(error.localizedDescription)
+                    
+                    // create get password alert
                     let alert = UIAlertController(title: "Delete Account", message: "Input password", preferredStyle: .alert)
                     let okAction = UIAlertAction(title: "OK", style: .default) { ok in
                         if let pwd = alert.textFields?[0].text {
@@ -70,10 +79,14 @@ class SettingsViewController: UITableViewController {
                     alert.addTextField()
                     self.present(alert, animated: true, completion: nil)
                 } else {
-                    // deleting user complete
+                    // deleting user complete without error(reauthenticate..)
+                    FirebaseVar.memberListener?.remove()
+                    FirebaseVar.scheduleListener?.remove()
+                    Member.removeStoredData(value: Member.me, key: nil)
                 }
             }
         } else {
+            // sign in
             performSegue(withIdentifier: "signInSegue", sender: nil)
         }
     }
@@ -85,8 +98,12 @@ class SettingsViewController: UITableViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        updateUI()
+        Member.getMyMemberData {
+            self.updateUI()
+        }
     }
+    
+    //MARK: - Refresh Control
     private func configureRefreshControl() {
         self.refreshControl = UIRefreshControl()
         
@@ -118,6 +135,8 @@ class SettingsViewController: UITableViewController {
         }
         self.refreshControl?.endRefreshing()
     }
+    
+    //MARK: -Privates
     private func generateSimpleAlert(message: String) -> Void {
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default) { ok in

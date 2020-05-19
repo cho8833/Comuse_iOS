@@ -10,12 +10,14 @@ import UIKit
 
 class EditAddScheduleViewController: UIViewController, UIPickerViewDelegate, UIPickerViewDataSource {
     
+    // MARK: - get View
     @IBOutlet weak var dayPicker: UIPickerView!
     @IBOutlet weak var endTimePicker: UIDatePicker!
     @IBOutlet weak var startTimePicker: UIDatePicker!
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var confirmButton: UIButton!
     
+    // MARK: - IBAction
     @IBAction func touchUpCancelButton(_ sender: Any) {
         self.dismiss(animated: true, completion: nil)
     }
@@ -45,24 +47,23 @@ class EditAddScheduleViewController: UIViewController, UIPickerViewDelegate, UIP
         }
         self.dismiss(animated: true, completion: nil)
     }
+    
+    //MARK: - Properties
     private let days: [String] = ["MON","TUE","WED","THU","FRI","SAT","SUN"]
     public var selectedDay: Int = 0
     public var startTime: String? = "00:00"
     public var endTime: String? = "00:00"
     public var classTitle: String? = nil
 
+    //MARK: - Life Cycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         dayPicker.delegate = self
         dayPicker.dataSource = self
-        // Do any additional setup after loading the view.
         
+        // TImePicker Setting
         timePickerSettings(timePicker: startTimePicker)
         timePickerSettings(timePicker: endTimePicker)
-        dayPicker.selectRow(selectedDay-1, inComponent: 0, animated: true)
-        if let title = classTitle {
-            titleTextField.text = title
-        }
         if let startTime = self.startTime {
             if let endTime = self.endTime {
                 let startHour = Int(startTime.split(separator: ":")[0])!
@@ -88,19 +89,12 @@ class EditAddScheduleViewController: UIViewController, UIPickerViewDelegate, UIP
             }
         }
         
+        // daypicker Setting
+        dayPicker.selectRow(selectedDay-1, inComponent: 0, animated: true)
+        if let title = classTitle {
+            titleTextField.text = title
+        }
     }
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
 //MARK: DayPicker Settings
 extension EditAddScheduleViewController {
@@ -154,6 +148,7 @@ extension EditAddScheduleViewController {
         }
     }
     // set startTimePicker valueChanged Methods
+    // endTime 이 startTime 보다 작아 지지 않게 설정
     @objc func timeChanged_startTime() -> Void {
         let startDate = startTimePicker.date
         let endDate = endTimePicker.date
@@ -163,6 +158,7 @@ extension EditAddScheduleViewController {
         } else { return }
     }
     // set endTimePicker valueChanged Methods
+    // endTime 이 startTime 보다 작아 지지 않게 설정
     @objc func timeChanged_endTime() -> Void {
         var startDate = startTimePicker.date
         let endDate = endTimePicker.date
@@ -174,7 +170,6 @@ extension EditAddScheduleViewController {
 }
 //MARK: privates
 extension EditAddScheduleViewController {
-    
     private func showAlert(message: String, control toBeFirstResponder: UIControl?) -> Void {
         let alert: UIAlertController = UIAlertController(title: "Alert", message: message, preferredStyle: UIAlertController.Style.alert)
         let okAction: UIAlertAction = UIAlertAction(title: "Input", style: UIAlertAction.Style.default) { [weak toBeFirstResponder] (action: UIAlertAction) in toBeFirstResponder?.becomeFirstResponder()
