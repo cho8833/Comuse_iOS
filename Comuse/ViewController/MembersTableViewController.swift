@@ -9,13 +9,18 @@
 import UIKit
 import Firebase
 
-class MembersTableViewController: UITableViewController {
+class MembersTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     let nameLabelTag = 101
     let positionLabelTag = 102
     let inoutStatusLabelTag = 103
+    
+    @IBOutlet weak var nameLabel: UILabel!
+    @IBOutlet weak var positionLabel: UILabel!
     // MARK: -Properties
-    @IBOutlet weak var updateInoutButton: UIBarButtonItem!
-    @IBAction func touchUpInoutStatusButton(_ sender: UIBarButtonItem) {
+    
+    @IBOutlet weak var updateInoutButton: UIButton!
+    
+    @IBAction func touchUpInoutStatusButton(_ sender: Any) {
         if let me = Member.me {
             if me.inoutStatus == false {
                 Member.updateInout(inoutStatus: true) {
@@ -25,7 +30,7 @@ class MembersTableViewController: UITableViewController {
                             "Status": "in" as NSObject
                         ])
                     }
-                    self.updateInoutStatusButton()
+                    self.updateUserInfo()
                 }
             } else {
                 Member.updateInout(inoutStatus: false) {
@@ -35,28 +40,27 @@ class MembersTableViewController: UITableViewController {
                             "Status": "out" as NSObject
                         ])
                     }
-                    self.updateInoutStatusButton()
+                    self.updateUserInfo()
                 }
             }
         } else {
             Member.getMyMemberData {
-                self.updateInoutStatusButton()
+                self.updateUserInfo()
             }
         }
-        
-        
     }
-    
+    @IBOutlet weak var tableView: UITableView!
     // MARK: -Life Cycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        tableView.delegate = self
+        tableView.dataSource = self
         self.configureRefreshControl()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         Member.getMyMemberData {
-            self.updateInoutStatusButton()
+            self.updateUserInfo()
         }
         if FirebaseVar.memberListener == nil {
             Member.getMembers(reload: tableView.reloadData)
@@ -64,32 +68,32 @@ class MembersTableViewController: UITableViewController {
     }
 
     // MARK: - Table view data source
-    override func numberOfSections(in tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
 
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
         return Member.members.count
     }
 
     // MARK: - Table view delegate
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "memberCell", for: indexPath)
-        guard indexPath.row < Member.members.count else { return cell }
-        
-        let member: Member = Member.members[indexPath.row]
-        (cell.viewWithTag(nameLabelTag) as! UILabel).text = member.name
-        if let position = member.position {
-            (cell.viewWithTag(positionLabelTag) as! UILabel).text = position
-        } else {
-            (cell.viewWithTag(positionLabelTag) as! UILabel).text = ""
-        }
-        
-        cell.textLabel?.text = member.name
-        if member.inoutStatus == true { (cell.viewWithTag(inoutStatusLabelTag) as! UILabel).text = "in" }
-        else { (cell.viewWithTag(inoutStatusLabelTag) as! UILabel).text = "out" }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "memberCell", for: indexPath)
+            guard indexPath.row < Member.members.count else { return cell }
+            
+            let member: Member = Member.members[indexPath.row]
+            (cell.viewWithTag(nameLabelTag) as! UILabel).text = member.name
+            if let position = member.position {
+                (cell.viewWithTag(positionLabelTag) as! UILabel).text = position
+            } else {
+                (cell.viewWithTag(positionLabelTag) as! UILabel).text = ""
+            }
+            
+            cell.textLabel?.text = member.name
+            if member.inoutStatus == true { (cell.viewWithTag(inoutStatusLabelTag) as! UILabel).text = "in" }
+            else { (cell.viewWithTag(inoutStatusLabelTag) as! UILabel).text = "out" }
 
         return cell
     }
@@ -99,23 +103,26 @@ class MembersTableViewController: UITableViewController {
 //MARK: - Refresh Control
 extension MembersTableViewController {
     private func configureRefreshControl() {
-        self.refreshControl = UIRefreshControl()
+        self.tableView.refreshControl = UIRefreshControl()
         
-        self.refreshControl?.addTarget(self, action: #selector(getData), for: .valueChanged)
+        self.tableView.refreshControl?.addTarget(self, action: #selector(getData), for: .valueChanged)
     }
-    @objc private func updateInoutStatusButton() {
+    @objc private func updateUserInfo() {
         if let myData = Member.me {
             if myData.inoutStatus == true {
-                self.updateInoutButton.title = "in"
+                self.updateInoutButton.setTitle("in", for: .normal)
             } else {
-                self.updateInoutButton.title = "out"
+                self.updateInoutButton.setTitle("out", for: .normal)
             }
+            positionLabel.text = myData.position
+            nameLabel.text = myData.name
         }
     }
+    
     @objc private func getData() {
         if Member.me == nil {
             Member.getMyMemberData {
-                self.updateInoutStatusButton()
+                self.updateUserInfo()
             }
         }
         
