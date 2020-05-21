@@ -9,7 +9,6 @@
 import UIKit
 import ObjectMapper
 import FirebaseFirestore
-
 /*
     유저의 정보를 담는 class
     FireStore/Members Collection 에 저장됨
@@ -20,7 +19,7 @@ struct Member {
     var name: String        // from FirebaseVar,user, can't be nil
     var inoutStatus: Bool   // addMember 되어 새로운 멤버 데이터가 생성된 경우 초기값은 false 이다.
     var position: String?   // Setting 에서 유저가 직접 edit 해야한다.
-    var uid: String         // from FirebaseVar.user, can't be nil
+    var email: String         // from FirebaseVar.user, can't be nil
     
     
 }
@@ -38,22 +37,22 @@ extension Member: Mappable {
             self.inoutStatus = inoutStatus as! Bool
         } else { return nil }
         self.position = map.JSON["position"] as? String
-        if let uid = map.JSON["uid"] {
-            self.uid = uid as! String
+        if let uid = map.JSON["email"] {
+            self.email = uid as! String
         } else { return nil }
     }
     mutating func mapping(map: Map) {
         name<-map["name"]
         inoutStatus<-map["inoutStatus"]
         position<-map["position"]
-        uid<-map["uid"]
+        email<-map["email"]
     }
 }
 //MARK: - My Member Database Data Control
 /*
-    user 의 Member Data 는 Member 타입의 me 객체에 저장된다. 그리고 FireStore/Members Collection 에 문서 이름은 Member.uid 로 저장된다.
+    user 의 Member Data 는 Member 타입의 me 객체에 저장된다. 그리고 FireStore/Members Collection 에 문서 이름은 Member.email 로 저장된다.
     me 객체는 데이터 통신의 지연을 없애기 위해 UserDefaults 를 이용하여 Local 에 저장한다.
-    me 객체의 데이터가 변경 되면, FireStore/Members Collection 에 Member.uid 를 이용하여 접근하여 데이터를 변경한다.
+    me 객체의 데이터가 변경 되면, FireStore/Members Collection 에 Member.email 를 이용하여 접근하여 데이터를 변경한다.
     데이터 변경은 FireStore 의 데이터를 먼저 변경 후 콜백 함수인 completion 이 호출되면 Local 데이터를 변경한다.
  */
 extension Member {
@@ -72,15 +71,17 @@ extension Member {
         else {
             if let user = FirebaseVar.user {
                 if let db = FirebaseVar.db {
-                    db.collection("Members").document(user.uid)
+                    db.collection("Members").document(user.email!)
                         .getDocument() { (document, error) in
                             if let document = document {
                                 // save me data in me(Member)
-                                if let member = Member(JSON: document.data()!) {
-                                    self.me = member
-                                    self.storeData(value: member, key: nil)
+                                if let data = document.data() {
+                                    let memberData = Member(JSON: data)
+                                    self.me = memberData
+                                    self.storeData(value: memberData, key: nil)
                                     completion()
-                                } else {
+                                }
+                                else {
                                     //get func success, but document.data() = nil
                                     //case: no user's member data in server
                                     self.addMemberData()
@@ -96,24 +97,24 @@ extension Member {
     }
     /*
         FireStore 에 데이터 추가 후 Local 에도 데이터를 저장한다
-        getMemberData 를 호출하였을 때 Database 에 user Data 가 없는 경우 호출된다.
+        getMemberData 를 호출하였을 때 Database 에 user Data 가 없는 경우 호출된다.( error code : 5(FirestoreErrorCode.notFound)
      */
     public static func addMemberData() -> Void {
         if let user = FirebaseVar.user {
             if let db = FirebaseVar.db {
-                db.collection("Members").document(user.uid)
+                db.collection("Members").document(user.email!)
                     .setData(optionalData:
                         [
                             "name": user.displayName,
                             "inoutStatus": false,
                             "position": nil,
-                            "uid": user.uid
+                            "email": user.email
                     ]) { error in
                         if let error = error {
-                            print("Error adding document: \(error)")
+                            print("\(error)")
                         } else {
                             if let user = FirebaseVar.user {
-                                let memberData = Member(name: user.displayName! , inoutStatus: false, position: nil, uid: user.uid)
+                                let memberData = Member(name: user.displayName! , inoutStatus: false, position: nil, email: user.email!)
                                 self.me = memberData
                                 self.storeData(value: memberData, key: nil)
                             }
@@ -124,11 +125,11 @@ extension Member {
         }
     }
     
-    // FireStore 의 user.uid 문서 이름의 문서를 삭제한다.
+    // FireStore 의 user.email 문서 이름의 문서를 삭제한다.
     public static func removeMemberData() -> Void {
         if let user = FirebaseVar.user {
             if let db = FirebaseVar.db {
-                db.collection("Members").document(user.uid)
+                db.collection("Members").document(user.email!)
                     .delete() {error in
                         if let error = error {
                             print("Error removing document: \(error)")
@@ -143,18 +144,24 @@ extension Member {
     }
     
     /*
-        FireSotre 의 user.uid 이름을 가진 문서의 inoutStatus 를 변경하고 변경에 성공하면 Local data 도 변경한다.
+        FireSotre 의 user.email 이름을 가진 문서의 inoutStatus 를 변경하고 변경에 성공하면 Local data 도 변경한다.
         변경이 완료되면 updateUI 가 필요하다.
      */
     public static func updateInout(inoutStatus: Bool, completion: @escaping() -> Void) -> Void {
         if let user = FirebaseVar.user {
             if let db = FirebaseVar.db {
-                db.collection("Members").document(user.uid)
+                db.collection("Members").document(user.email!)
                     .updateData([
                         "inoutStatus": inoutStatus
-                    ]) { err in
+                    ]){ err in
                         if let err = err {
-                            print("Error updateing inoutStatus: \(err)")
+                            // error occured updating inout
+                            // case 1 : no document
+                            print("\(err.localizedDescription)")
+                            if (err as NSError).code == FirestoreErrorCode.notFound.rawValue {
+                                Member.addMemberData();
+                            }
+                            
                         } else {
                             
                             if(inoutStatus == true) {
@@ -173,13 +180,13 @@ extension Member {
     }
     
     /*
-        FireStore 의 user.uid 이름을 가진 문서의 position 을 변경하고 변경에 성공하면 Local data 도 변경한다.
+        FireStore 의 user.email 이름을 가진 문서의 position 을 변경하고 변경에 성공하면 Local data 도 변경한다.
         변경이 완료되면 updateUI 가 필요하다.
      */
     public static func editPosition(position: String, completion:@escaping ()-> Void) -> Void {
         if let user = FirebaseVar.user {
             if let db = FirebaseVar.db {
-                db.collection("Members").document(user.uid)
+                db.collection("Members").document(user.email!)
                     .updateData(["position": position]) { error in
                         if let error = error {
                             print("error update position: \(error)")
@@ -220,7 +227,7 @@ extension Member {
                         }
                         if (diff.type == .modified) {
                             if let modified = Member(JSON: diff.document.data()) {
-                                if let index = members.firstIndex(where: { $0.uid == modified.uid}) {
+                                if let index = members.firstIndex(where: { $0.email == modified.email}) {
                                     members.remove(at: index)
                                     members.insert(modified, at: index)
                                     
@@ -229,7 +236,7 @@ extension Member {
                         }
                         if (diff.type == .removed) {
                             if let removed = Member(JSON: diff.document.data()) {
-                                if let indexOfElement = members.firstIndex(where: { $0.uid == removed.uid }) {
+                                if let indexOfElement = members.firstIndex(where: { $0.email == removed.email }) {
                                     members.remove(at: indexOfElement)
                                     
                                 }
@@ -254,7 +261,7 @@ extension Member {
             if let position = memberData.position {
                 UserDefaults.standard.set(position, forKey: "position")
             }
-            UserDefaults.standard.set(memberData.uid, forKey: "uid")
+            UserDefaults.standard.set(memberData.email, forKey: "email")
             UserDefaults.standard.set(memberData.inoutStatus, forKey: "inoutStatus")
         } else {
             if let forKey = key {
@@ -270,7 +277,7 @@ extension Member {
         if let _ = value as? Member {
             UserDefaults.standard.removeObject(forKey: "name")
             UserDefaults.standard.removeObject(forKey: "position")
-            UserDefaults.standard.removeObject(forKey: "uid")
+            UserDefaults.standard.removeObject(forKey: "email")
             UserDefaults.standard.removeObject(forKey: "inoutStatus")
         } else {
             if let forKey = key {
@@ -279,8 +286,8 @@ extension Member {
         }
     }
     public static func getMyStoredData() -> Member? {
-        if let name = UserDefaults.standard.string(forKey: "name"), let uid = UserDefaults.standard.string(forKey: "uid") {
-            return Member(name: name, inoutStatus: UserDefaults.standard.bool(forKey: "inoutStatus"), position: UserDefaults.standard.string(forKey: "position"), uid: uid)
+        if let name = UserDefaults.standard.string(forKey: "name"), let email = UserDefaults.standard.string(forKey: "email") {
+            return Member(name: name, inoutStatus: UserDefaults.standard.bool(forKey: "inoutStatus"), position: UserDefaults.standard.string(forKey: "position"), email: email)
         } else { return nil }
     }
 }

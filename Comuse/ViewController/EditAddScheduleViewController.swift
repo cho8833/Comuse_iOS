@@ -38,12 +38,13 @@ class EditAddScheduleViewController: UIViewController, UIPickerViewDelegate, UIP
             if checkTimeValid(classTitle: classTitle, startTime: startTimeObject, endTime: endTimeObject, day: selectedDay) == false {
                 return
             }
-            let schedule = Schedule(day: selectedDay, startTime: startTimeObject, endTime: endTimeObject, classPlace: "", professorName: user.uid, classTitle: classTitle)
+            let schedule = Schedule(day: selectedDay, startTime: startTimeObject, endTime: endTimeObject, classPlace: "", professorName: user.email!, classTitle: classTitle)
             
-            if Schedule.addSchedule(schedule: schedule) == false {
-                self.showAlert(message: "Wrong Schedule", control: nil)
+            if isEdit == true {
+                Schedule.editSchedule(docNameBeforeEdit: scheduleIdBeforeEdit, editedSchedule: schedule)
+            } else {
+                Schedule.addSchedule(schedule: schedule)
             }
-            
         }
         self.dismiss(animated: true, completion: nil)
     }
@@ -54,7 +55,8 @@ class EditAddScheduleViewController: UIViewController, UIPickerViewDelegate, UIP
     public var startTime: String? = "00:00"
     public var endTime: String? = "00:00"
     public var classTitle: String? = nil
-
+    public var isEdit: Bool = false
+    public var scheduleIdBeforeEdit: String = ""
     //MARK: - Life Cycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -188,6 +190,7 @@ extension EditAddScheduleViewController {
         }
         for index in 0..<Schedule.schedules.count {
             let schedule: Schedule = Schedule.schedules[index]
+            if Schedule.getDocumentID(schedule: schedule) == scheduleIdBeforeEdit { continue }
             if(schedule.day == day) {
                 if(((schedule.startTime.hour == endTime.hour) && (schedule.startTime.minute < endTime.minute)) ||
                     ((schedule.endTime.hour == startTime.hour) && (schedule.endTime.minute > startTime.minute))) {

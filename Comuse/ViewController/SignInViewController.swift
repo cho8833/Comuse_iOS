@@ -31,7 +31,7 @@ class SignInViewController: UIViewController, GIDSignInDelegate {
                 } else {
                     FirebaseVar.db = Firestore.firestore()
                     FirebaseVar.user = Auth.auth().currentUser
-                    Member.addMemberData()
+                    Member.getMyMemberData {}
                     
                     self.dismiss(animated: true, completion: nil)
                 }})

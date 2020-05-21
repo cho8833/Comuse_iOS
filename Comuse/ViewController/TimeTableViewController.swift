@@ -61,7 +61,8 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
                 nextViewController.classTitle = sender.courseName
                 nextViewController.startTime = sender.startTime
                 nextViewController.endTime = sender.endTime
-                
+                nextViewController.isEdit = true
+                nextViewController.scheduleIdBeforeEdit = sender.courseId
                 
             }
         }
@@ -89,7 +90,7 @@ extension TimeTableViewController {
     // onclick
     func elliotable(elliotable: Elliotable, didSelectCourse selectedCourse: ElliottEvent) {
         if let user = FirebaseVar.user {
-            if selectedCourse.professor == user.uid {
+            if selectedCourse.professor == user.email {
                 let alert = UIAlertController(title: nil, message: "Manage Schedule", preferredStyle: .actionSheet)
                 
                 // edit button

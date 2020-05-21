@@ -23,7 +23,7 @@ struct Schedule {
     var endTime: Time               // 종료 시간
     var classPlace: String?         // TimeTable 의 Schedule 에서 생성될 때 classTitle 하단에 표시되는 문자열
                                     // 현재는 쓰지 않아 nil 로 저장하지만 추후에 작성자의 이름을 저장할까 고려중
-    var professorName: String       // 작성자의 uid 저장. TimeTable 내에서 touchUp 되었을 때 자신이 작성한 Schedule 인지 확인하기 위해 사용한다.
+    var professorName: String       // 작성자의 email 저장. TimeTable 내에서 touchUp 되었을 때 자신이 작성한 Schedule 인지 확인하기 위해 사용한다.
     var classTitle: String          // Schedule 의 Title, TimeTable 내에서 생성될 때 Schedule 내에 표시된다.
 }
 //MARK: - JSON -> Schedule Methods
@@ -112,17 +112,15 @@ extension Schedule {
  */
 extension Schedule {
     // FIreStore/TimeTable Collection 에 문서를 추가한다.
-    public static func addSchedule(schedule: Schedule) -> Bool {
+    public static func addSchedule(schedule: Schedule) -> Void {
         if let _ = FirebaseVar.user {
             if let db = FirebaseVar.db {
                     let json = Mapper().toJSON(schedule)
                     let documentID = getDocumentID(schedule: schedule)
                     db.collection("TimeTable").document(documentID)
                         .setData(json)
-                    return true
             }
         }
-        return false
     }
     // FireStore/TimeTable Collection 에 문서를 제거한다.
     public static func removeSchedule(documentID: String) -> Bool {
@@ -134,6 +132,14 @@ extension Schedule {
             }
         }
         return false
+    }
+    public static func editSchedule(docNameBeforeEdit: String, editedSchedule: Schedule) -> Void {
+        if let _ = FirebaseVar.user {
+            if let _ = FirebaseVar.db {
+                addSchedule(schedule: editedSchedule)
+                removeSchedule(documentID: docNameBeforeEdit);
+            }
+        }
     }
 }
 //MARK: Privates

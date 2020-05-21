@@ -16,37 +16,41 @@ class MembersTableViewController: UITableViewController {
     // MARK: -Properties
     @IBOutlet weak var updateInoutButton: UIBarButtonItem!
     @IBAction func touchUpInoutStatusButton(_ sender: UIBarButtonItem) {
-        if Member.me?.inoutStatus == false {
-            Member.updateInout(inoutStatus: true) {
-                if let user = FirebaseVar.user {
-                    Analytics.logEvent("updated_Inout", parameters: [
-                        "MemberName": user.displayName! as NSObject,
-                        "Status": "in" as NSObject
-                    ])
+        if let me = Member.me {
+            if me.inoutStatus == false {
+                Member.updateInout(inoutStatus: true) {
+                    if let user = FirebaseVar.user {
+                        Analytics.logEvent("updated_Inout", parameters: [
+                            "MemberName": user.displayName! as NSObject,
+                            "Status": "in" as NSObject
+                        ])
+                    }
+                    self.updateInoutStatusButton()
                 }
-                self.updateInoutStatusButton()
+            } else {
+                Member.updateInout(inoutStatus: false) {
+                    if let user = FirebaseVar.user {
+                        Analytics.logEvent("updated_Inout", parameters: [
+                            "MemberName": user.displayName! as NSObject,
+                            "Status": "out" as NSObject
+                        ])
+                    }
+                    self.updateInoutStatusButton()
+                }
             }
         } else {
-            Member.updateInout(inoutStatus: false) {
-                if let user = FirebaseVar.user {
-                    Analytics.logEvent("updated_Inout", parameters: [
-                        "MemberName": user.displayName! as NSObject,
-                        "Status": "out" as NSObject
-                    ])
-                }
+            Member.getMyMemberData {
                 self.updateInoutStatusButton()
             }
         }
+        
         
     }
     
     // MARK: -Life Cycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        Member.getMembers(reload: self.tableView.reloadData)
-        Member.getMyMemberData() {
-            self.updateInoutStatusButton()
-        }
+        
         self.configureRefreshControl()
     }
     override func viewWillAppear(_ animated: Bool) {

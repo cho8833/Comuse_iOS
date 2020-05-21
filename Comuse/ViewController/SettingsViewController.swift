@@ -60,13 +60,14 @@ class SettingsViewController: UITableViewController {
                             FirebaseVar.user?.reauthenticate(with: credential) { authDataResult, error in
                                 if let error = error {
                                     // error occuered when reauthenticating
-                                    self.generateSimpleAlert(message: error.localizedDescription)
+                                    self.generateSimpleAlert(title: "Error", message: error.localizedDescription)
                                 } else {
                                     // deleting user complete
                                     FirebaseVar.user?.delete()
                                     FirebaseVar.memberListener?.remove()
                                     FirebaseVar.scheduleListener?.remove()
                                     Member.removeStoredData(value: Member.me, key: nil)
+                                    self.generateSimpleAlert(title: "Complete", message: "Sign Out Success")
                                 }
                             }
                         }
@@ -83,6 +84,7 @@ class SettingsViewController: UITableViewController {
                     FirebaseVar.memberListener?.remove()
                     FirebaseVar.scheduleListener?.remove()
                     Member.removeStoredData(value: Member.me, key: nil)
+                    self.generateSimpleAlert(title: "Complete", message: "Sign Out Success")
                 }
             }
         } else {
@@ -137,8 +139,8 @@ class SettingsViewController: UITableViewController {
     }
     
     //MARK: -Privates
-    private func generateSimpleAlert(message: String) -> Void {
-        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+    private func generateSimpleAlert(title: String, message: String) -> Void {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default) { ok in
             alert.dismiss(animated: true, completion: nil)
         }
