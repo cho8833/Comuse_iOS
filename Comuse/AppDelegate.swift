@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         GIDSignIn.sharedInstance()?.clientID = FirebaseApp.app()?.options.clientID
         
         FirebaseVar.user = Auth.auth().currentUser
-        FirebaseVar.db = Firestore.firestore()
+        FirebaseVar.dbFIB = Firestore.firestore()
         
         sleep(2)
         // Override point for customization after application launch.

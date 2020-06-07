@@ -13,6 +13,7 @@ pod 'ObjectMapper'
 pod 'RxCocoa'
 pod 'RxSwift'
 pod 'Firebase/Analytics'
+pod 'RealmSwift'
   # Pods for Comuse
 
 end
