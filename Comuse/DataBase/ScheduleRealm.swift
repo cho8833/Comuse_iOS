@@ -12,7 +12,7 @@ import RxSwift
 
 class ScheduleRealm {
     private var schedulesList: [Schedule] = Array()
-    public var schedulesSubject = PublishSubject<[Schedule]>()
+    public var schedulesSubject = ReplaySubject<[Schedule]>.create(bufferSize: 20)
     let realm = try! Realm()
     
     // MARK: Get All Schedules
@@ -25,7 +25,7 @@ class ScheduleRealm {
                 print("\(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])")
             }
         } catch {
-            print("Query error \(error)")
+            self.schedulesSubject.onError(error)
         }
     }
     
@@ -36,7 +36,7 @@ class ScheduleRealm {
                 realm.add(schedule, update: .all)
             }
         } catch {
-            print("Add Error \(error)")
+            self.schedulesSubject.onError(error)
         }
     }
     
@@ -47,18 +47,19 @@ class ScheduleRealm {
                 realm.add(schedule, update: .all)
             }
         } catch {
-            print("Update Error \(error)")
+            self.schedulesSubject.onError(error)
         }
     }
     
     //MARK: Delete Schedule
-    public func deleteScheduleFromLocal(schedule: Schedule) {
+    public func deleteScheduleFromLocal(scheduleKey: String) {
         do {
             try realm.write() {
-                realm.delete(schedule)
+                let object = realm.objects(Schedule.self).filter("id == \(scheduleKey)")
+                realm.delete(object)
             }
         } catch {
-            print("Delete Error \(error)")
+            self.schedulesSubject.onError(error)
         }
     }
 }

@@ -8,7 +8,12 @@
 
 import UIKit
 import RxSwift
+
 class MemberViewModel {
+    //singleton pattern
+    public static let memberViewModel =  MemberViewModel()
+    
+    
     // FireStore Communication Object
     private let fireStoreManager = MemberFireStoreManager()
     
@@ -17,19 +22,26 @@ class MemberViewModel {
     
     public var membersForView = PublishSubject<[Member]>()
     
-    public func getMembers() -> PublishSubject<[Member]> {
+    private let disposebag = DisposeBag()
+    
+    public func getMembers() {
         // get members from local
         memberRealm.getMembersFromLocal()
+        memberRealm.membersSubject.subscribe(
+            onNext: { members in
+                self.membersForView.onNext(members)
+            }
+        ).disposed(by: self.disposebag)
+        
         // get members from firestore
         fireStoreManager.getMembersFromFireStore()
-        
-        memberRealm.membersSubject.subscribe(onNext: { schedules in
-            self.membersForView.onNext(schedules)
-        })
-        fireStoreManager.membersSubject.subscribe(onNext: { schedules in
-            self.membersForView.onNext(schedules)
-        })
-        return self.membersForView
+        fireStoreManager.membersSubject.subscribe(
+            onNext: { members in
+                self.membersForView.onNext(members)
+            },
+            onError: { error in
+                self.membersForView.onError(error)
+            }
+        ).disposed(by: self.disposebag)
     }
-    
 }

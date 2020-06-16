@@ -8,19 +8,21 @@
 
 import UIKit
 import Elliotable
+import FirebaseAuth
+import RxSwift
 
 class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableDataSource {
     
-    
-
     @IBOutlet weak var timeTable: Elliotable!
     private let backgroundColors = [ 0xecc369, 0xa7ca70, 0x7dd1c1, 0x7aa5e9, 0xfbaa68, 0x9f86e1, 0x78cb87, 0xd397ed ]
     private var colorIndex: Int = 0
-    private var scheduleViewModel: ScheduleViewModel = ScheduleViewModel()
     private var items: [ElliottEvent] = []
     private let day = ["MON","TUE","WED","THU","FRI","SAT","SUN"]
+    private let disposebag = DisposeBag()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         //TimeTable Setting
         timeTable.delegate = self
         timeTable.dataSource = self
@@ -28,29 +30,76 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
         timeTable.borderColor = UIColor(red: 0.85, green: 0.85, blue: 0.85, alpha: 0.1)
         timeTable.borderWidth = 1
         
-        scheduleViewModel.getSchedules().subscribe(onNext: { schedules in
-            self.items.removeAll()
-            schedules.forEach { schedule in
-                self.addCourse(schedule: schedule)
+        // bind Schedule to TimeTable
+        self.bindSchedules()
+        
+        _ = Auth.auth().addStateDidChangeListener { (auth, user) in         // Login State Listener
+            if let _ = user {
+                ScheduleViewModel.scheduleViewModel.getSchedules()
             }
-            self.timeTable.reloadData()
-        })
-        // Do any additional setup after loading the view.
+        }
     }
-    /*
-    // MARK: - Navigation
+    //MARK: - bind Schedules to TimeTable Method
+    private func bindSchedules() {
+        ScheduleViewModel.scheduleViewModel.schedulesForView.subscribe(
+            onNext: { schedules in
+                self.items.removeAll()
+                schedules.forEach { schedule in
+                    self.addCourse(schedule: schedule)
+                }
+                self.timeTable.reloadData()
+            },
+            onError: { error in
+                ErrorHandler.generateSnackBarWithAction(title: error.localizedDescription, actionTitle: "ReFresh", onAction: self.bindSchedules)
+            }
+        ).disposed(by: self.disposebag)
+    }
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "editSegue" {
+            if let sender: ElliottEvent = sender as? ElliottEvent {
+                guard let nextViewController: EditAddScheduleViewController = segue.destination as? EditAddScheduleViewController else {
+                    return
+                }
+                // Edit/AddScheduleViewController 의 view 들의 초기 정보를 전달한다.
+                nextViewController.selectedDay = sender.courseDay.rawValue
+                nextViewController.classTitle = sender.courseName
+                nextViewController.startTime = sender.startTime
+                nextViewController.endTime = sender.endTime
+                nextViewController.isEdit = true
+                nextViewController.scheduleIdBeforeEdit = sender.courseId
+                
+            }
+        }
     }
-    */
+    
 }
 //MARK: TimeTable Delegate Methods
 extension TimeTableViewController {
     func elliotable(elliotable: Elliotable, didSelectCourse selectedCourse: ElliottEvent) {
-        
+        if let user = FirebaseVar.user {
+            if selectedCourse.professor == user.email {
+                let alert = UIAlertController(title: nil, message: "Manage Schedule", preferredStyle: .actionSheet)
+                
+                // edit button
+                let editAction = UIAlertAction(title: "Edit", style: .default) { (action) in
+                    self.performSegue(withIdentifier: "editSegue", sender: selectedCourse)
+                }
+                
+                // remove button
+                let removeAction = UIAlertAction(title: "Remove", style: .default) { (action) in
+                    ScheduleViewModel.scheduleViewModel.deleteSchedule(scheduleKey: selectedCourse.courseId)
+                }
+                
+                // cancel button
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                alert.addAction(editAction)
+                alert.addAction(removeAction)
+                alert.addAction(cancelAction)
+                present(alert, animated: false, completion: nil)
+            }
+            else { return }
+        }
     }
     
     func elliotable(elliotable: Elliotable, didLongSelectCourse longSelectedCourse: ElliottEvent) {

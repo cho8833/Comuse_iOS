@@ -14,6 +14,7 @@ pod 'RxCocoa'
 pod 'RxSwift'
 pod 'Firebase/Analytics'
 pod 'RealmSwift'
+pod 'MaterialComponents/Snackbar'
   # Pods for Comuse
 
 end

@@ -10,8 +10,9 @@
 import UIKit
 import RealmSwift
 import RxSwift
+
 class MemberRealm {
-    public var membersSubject = PublishSubject<[Member]>()
+    public var membersSubject = ReplaySubject<[Member]>.create(bufferSize: 100)
     private var membersList = Array<Member>()
     
     let realm = try! Realm()
@@ -25,7 +26,8 @@ class MemberRealm {
                 self.membersSubject.onNext(self.membersList)
             }
         } catch {
-            print("Get Members \(error)")
+            // error
+            self.membersSubject.onError(error)
         }
     }
     
@@ -36,7 +38,8 @@ class MemberRealm {
                 realm.add(member, update: .all)
             }
         } catch {
-            print("Add Member \(error)")
+            // error
+            self.membersSubject.onError(error)
         }
     }
     
@@ -47,7 +50,8 @@ class MemberRealm {
                 realm.add(member, update: .all)
             }
         } catch {
-            print("Update Member \(error)")
+            // error
+            self.membersSubject.onError(error)
         }
     }
     
@@ -58,7 +62,8 @@ class MemberRealm {
                 realm.delete(member)
             }
         } catch {
-            print("Remove Member \(error)")
+            // error
+            self.membersSubject.onError(error)
         }
     }
 }

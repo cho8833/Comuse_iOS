@@ -22,11 +22,12 @@ class MemberFireStoreManager {
  */
 extension MemberFireStoreManager {
     public func getMembersFromFireStore() -> Void {
-        if let _ = FirebaseVar.user, let db = FirebaseVar.dbFIB {
+        if let db = FirebaseVar.dbFIB {
             FirebaseVar.memberListener = db.collection("Members")
                 .addSnapshotListener { querySnapshot, error in
                     guard let snapshot = querySnapshot else {
-                        print("Error fetching snapshots: \(error!)")
+                        //notify error
+                        self.membersSubject.onError(error!)
                         return
                     }
                     snapshot.documentChanges.forEach { diff in

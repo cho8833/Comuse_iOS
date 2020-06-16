@@ -17,9 +17,12 @@ class UserDataFireStoreManager {
 extension UserDataFireStoreManager {
     // MARK: Get UserData From FireStore
     public func getUserDataFromFireStore(onSuccess: @escaping(_ value: Member) -> Void) -> Void {
-        if let user = FirebaseVar.user, let db = FirebaseVar.dbFIB {
+        if let db = FirebaseVar.dbFIB, let user = FirebaseVar.user {
             db.collection("Members").document(user.email!)
                 .getDocument { document, error in
+                    if let error = error {
+                        self.userDataSubject.onError(error)
+                    }
                     if let doc = document {
                         if let data = doc.data() {
                             let member = Member(JSON: data)
@@ -38,7 +41,7 @@ extension UserDataFireStoreManager {
     
     // MARK: Add UserData In FireStore
     public func addUserDataInFireStore(onSuccess: @escaping(_ value: Member) -> Void) -> Void {
-        if let user = FirebaseVar.user, let db = FirebaseVar.dbFIB {
+        if let db = FirebaseVar.dbFIB, let user = FirebaseVar.user {
             db.collection("Members").document(user.email!)
             .setData([
                 "name": user.displayName!,
@@ -48,6 +51,7 @@ extension UserDataFireStoreManager {
             ]) { error in
                 if let error = error {
                     // notify error
+                    self.userDataSubject.onError(error)
                 } else {
                     self.userData = Member(name: user.displayName!, email: user.email!, inoutStatus: false, position: "")
                     onSuccess(self.userData!)
@@ -59,11 +63,12 @@ extension UserDataFireStoreManager {
     
     // MARK: Update InOutStatus
     public func updateInOutStatusInFireStore(inoutStatus: Bool, onSuccess: @escaping(_ inoutStatus: Bool) -> Void) -> Void {
-        if let user = FirebaseVar.user, let db = FirebaseVar.dbFIB {
+        if let db = FirebaseVar.dbFIB, let user = FirebaseVar.user {
             db.collection("Members").document(user.email!)
                 .updateData(["inoutStatus": inoutStatus]) { error in
                     if let error = error {
                         // notify error
+                        self.userDataSubject.onError(error)
                     } else {
                         self.userData?.inoutStatus = inoutStatus
                         onSuccess(inoutStatus)
@@ -75,11 +80,12 @@ extension UserDataFireStoreManager {
     
     // MARK: Update Position
     public func updatePositionInFireStore(position: String, onSuccess: @escaping(_ position: String) -> Void) -> Void {
-        if let user = FirebaseVar.user, let db = FirebaseVar.dbFIB {
+        if let db = FirebaseVar.dbFIB, let user = FirebaseVar.user {
             db.collection("Members").document(user.email!)
                 .updateData(["position": position]) { error in
                     if let error = error {
                         // notify error
+                        self.userDataSubject.onError(error)
                     } else {
                         self.userData?.position = position
                         onSuccess(position)

@@ -8,7 +8,10 @@
 
 import UIKit
 import RxSwift
+
 struct ScheduleViewModel {
+    // singleton pattern
+    public static let scheduleViewModel =  ScheduleViewModel()
     
     // FireStore Communication Object
     public let fireStoreManager: ScheduleFireStoreManager = ScheduleFireStoreManager()
@@ -18,25 +21,31 @@ struct ScheduleViewModel {
     
     public var schedulesForView = PublishSubject<[Schedule]>()
     
-    public func getSchedules() -> PublishSubject<[Schedule]> {
+    public let disposebag = DisposeBag()
+    
+    public func getSchedules() {
         // get schedules from local
         scheduleRealm.getSchedulesFromLocal()
+        scheduleRealm.schedulesSubject.subscribe(onNext: { schedules in
+            self.schedulesForView.onNext(schedules)
+        }).disposed(by: self.disposebag)
         
         // get scheules from firestore
         fireStoreManager.getSchedulesFromFireStore()
-        
-        scheduleRealm.schedulesSubject.subscribe(onNext: { schedules in
-            self.schedulesForView.onNext(schedules)
-        })
-        
         fireStoreManager.schedulesSubject.subscribe(onNext: { schedules in
             self.schedulesForView.onNext(schedules)
-        })
+        }).disposed(by: self.disposebag)
+    }
+    public func getSchedulesFromGlobal() -> PublishSubject<[Schedule]> {
+        fireStoreManager.getSchedulesFromFireStore()
+        fireStoreManager.schedulesSubject.subscribe(onNext: { schedules in
+            self.schedulesForView.onNext(schedules)
+        }).disposed(by: self.disposebag)
         return self.schedulesForView
     }
-    public func deleteSchedule(schedule: Schedule) {
-        fireStoreManager.removeSchedule(documentID: schedule.key)
-        scheduleRealm.deleteScheduleFromLocal(schedule: schedule)
+    public func deleteSchedule(scheduleKey: String) {
+        fireStoreManager.removeSchedule(documentID: scheduleKey)
+        scheduleRealm.deleteScheduleFromLocal(scheduleKey: scheduleKey)
     }
     public func updateSchedule(schedule: Schedule) {
         fireStoreManager.updateSchedule(schedule: schedule)

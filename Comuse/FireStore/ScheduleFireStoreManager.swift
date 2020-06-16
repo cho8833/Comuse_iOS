@@ -24,40 +24,38 @@ class ScheduleFireStoreManager {
 extension ScheduleFireStoreManager {
     
     public func getSchedulesFromFireStore() -> Void {
-        if let _ = FirebaseVar.user {
-            if let db = FirebaseVar.dbFIB {
-                FirebaseVar.scheduleListener = db.collection("TimeTable").addSnapshotListener { querySnapshot, error in
-                    guard let snapshot = querySnapshot else {
-                        print("Error fetching snapshots: \(error!)")
-                        return
-                    }
-                    snapshot.documentChanges.forEach { diff in
-                        if (diff.type == .added) {
-                            if let added = Schedule(JSON: diff.document.data()) {
-                                self.schedulesList.append(added)
-                                self.scheduleRealm.addScheduleToLocal(schedule: added)
-                            }
-                        }
-                        else if (diff.type == .modified) {
-                            if let modified = Schedule(JSON: diff.document.data()) {
-                                if let indexOfElement = self.schedulesList.firstIndex(where: { modified.key == $0.key}) {
-                                    self.schedulesList.remove(at: indexOfElement)
-                                    self.schedulesList.insert(modified, at: indexOfElement)
-                                    self.scheduleRealm.updateScheduleToLocal(schedule: modified)
-                                }
-                            }
-                        }
-                        else if (diff.type == .removed) {
-                            if let removed = Schedule(JSON: diff.document.data()) {
-                                if let indexOfElement = self.schedulesList.firstIndex(where:{ removed.key==$0.key }) {
-                                    self.schedulesList.remove(at: indexOfElement)
-                                    self.scheduleRealm.deleteScheduleFromLocal(schedule: removed)
-                                }
-                            }
-                        }
-                    }
-                    self.schedulesSubject.onNext(self.schedulesList)
+        if let db = FirebaseVar.dbFIB {
+            FirebaseVar.scheduleListener = db.collection("TimeTable").addSnapshotListener { querySnapshot, error in
+                guard let snapshot = querySnapshot else {
+                    self.schedulesSubject.onError(error!)
+                    return
                 }
+                snapshot.documentChanges.forEach { diff in
+                    if (diff.type == .added) {
+                        if let added = Schedule(JSON: diff.document.data()) {
+                            self.schedulesList.append(added)
+                            self.scheduleRealm.addScheduleToLocal(schedule: added)
+                        }
+                    }
+                    else if (diff.type == .modified) {
+                        if let modified = Schedule(JSON: diff.document.data()) {
+                            if let indexOfElement = self.schedulesList.firstIndex(where: { modified.key == $0.key}) {
+                                self.schedulesList.remove(at: indexOfElement)
+                                self.schedulesList.insert(modified, at: indexOfElement)
+                                self.scheduleRealm.updateScheduleToLocal(schedule: modified)
+                            }
+                        }
+                    }
+                    else if (diff.type == .removed) {
+                        if let removed = Schedule(JSON: diff.document.data()) {
+                            if let indexOfElement = self.schedulesList.firstIndex(where:{ removed.key==$0.key }) {
+                                self.schedulesList.remove(at: indexOfElement)
+                                self.scheduleRealm.deleteScheduleFromLocal(scheduleKey: removed.key)
+                            }
+                        }
+                    }
+                }
+                self.schedulesSubject.onNext(self.schedulesList)
             }
         }
     }
@@ -72,35 +70,29 @@ extension ScheduleFireStoreManager {
 extension ScheduleFireStoreManager {
     // FIreStore/TimeTable Collection 에 문서를 추가한다.
     public func addSchedule(schedule: Schedule) -> Void {
-        if let _ = FirebaseVar.user {
-            if let db = FirebaseVar.dbFIB {
-                    let json = Mapper().toJSON(schedule)
-                db.collection("TimeTable").document(schedule.key)
-                        .setData(json)
-            }
+        if let db = FirebaseVar.dbFIB {
+            let json = Mapper().toJSON(schedule)
+            db.collection("TimeTable").document(schedule.key)
+                    .setData(json)
         }
     }
     // FireStore/TimeTable Collection 에 문서를 제거한다.
     public func removeSchedule(documentID: String) -> Void {
-        if let _ = FirebaseVar.user {
-            if let db = FirebaseVar.dbFIB {
-                db.collection("TimeTable").document(documentID)
-                .delete()
-            }
+        if let db = FirebaseVar.dbFIB {
+            db.collection("TimeTable").document(documentID)
+            .delete()
         }
     }
     // FireStore/TimeTable Collection 의 문서를 update 한다.
     public func updateSchedule(schedule: Schedule) -> Void {
-        if let _ = FirebaseVar.user {
-            if let db = FirebaseVar.dbFIB {
-                db.collection("TimeTable").document(schedule.key)
-                    .updateData(["classTitle":      schedule.classTitle,
-                                 "startTimeHour":   schedule.startTimeHour,
-                                 "startTimeMinute": schedule.startTimeMinute,
-                                 "endTimeHour":     schedule.endTimeHour,
-                                 "endTimeMinute":   schedule.endTimeMinute,
-                                 "day":             schedule.day])
-            }
+        if let db = FirebaseVar.dbFIB {
+            db.collection("TimeTable").document(schedule.key)
+                .updateData(["classTitle":      schedule.classTitle,
+                            "startTimeHour":   schedule.startTimeHour,
+                            "startTimeMinute": schedule.startTimeMinute,
+                            "endTimeHour":     schedule.endTimeHour,
+                            "endTimeMinute":   schedule.endTimeMinute,
+                            "day":             schedule.day])
         }
     }
 }

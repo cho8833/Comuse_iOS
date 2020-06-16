@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		65D935D4FBC8D68420C6CD6D /* Pods_Comuse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D13D483D4F53B9D8A6CCF61 /* Pods_Comuse.framework */; };
+		660ACC2B2490E3E5005D7BF6 /* EditAddScheduleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660ACC2A2490E3E5005D7BF6 /* EditAddScheduleViewController.swift */; };
 		660E5BFB245D2E6F007154A1 /* FirebaseVar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660E5BFA245D2E6F007154A1 /* FirebaseVar.swift */; };
 		6638E9CD248BDBD400E5EFE1 /* UserDataDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6638E9CC248BDBD400E5EFE1 /* UserDataDefaults.swift */; };
 		6638E9CF248BDE5D00E5EFE1 /* UserDataViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6638E9CE248BDE5D00E5EFE1 /* UserDataViewModel.swift */; };
@@ -24,6 +25,8 @@
 		6679EF81248109540022541A /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6679EF80248109540022541A /* Schedule.swift */; };
 		6679EF83248109C60022541A /* ScheduleFireStoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6679EF82248109C60022541A /* ScheduleFireStoreManager.swift */; };
 		6679EF8524810A380022541A /* Member.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6679EF8424810A380022541A /* Member.swift */; };
+		668D018A249239C800D84F6C /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668D0189249239C800D84F6C /* SignInViewController.swift */; };
+		66B90A25249885390087A73C /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66B90A24249885390087A73C /* ErrorHandler.swift */; };
 		66DB126D24862C3100BF351A /* ScheduleRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DB126C24862C3100BF351A /* ScheduleRealm.swift */; };
 		66DB126F2487AD3900BF351A /* TimeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DB126E2487AD3900BF351A /* TimeTableViewController.swift */; };
 		66DB12712487BA8400BF351A /* MemberRealm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66DB12702487BA8400BF351A /* MemberRealm.swift */; };
@@ -33,6 +36,7 @@
 
 /* Begin PBXFileReference section */
 		1365BD6E4D2CE6FC6A99D7E2 /* Pods-Comuse.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Comuse.debug.xcconfig"; path = "Target Support Files/Pods-Comuse/Pods-Comuse.debug.xcconfig"; sourceTree = "<group>"; };
+		660ACC2A2490E3E5005D7BF6 /* EditAddScheduleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAddScheduleViewController.swift; sourceTree = "<group>"; };
 		660E5BFA245D2E6F007154A1 /* FirebaseVar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseVar.swift; sourceTree = "<group>"; };
 		6638E9CC248BDBD400E5EFE1 /* UserDataDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDataDefaults.swift; sourceTree = "<group>"; };
 		6638E9CE248BDE5D00E5EFE1 /* UserDataViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDataViewModel.swift; sourceTree = "<group>"; };
@@ -51,6 +55,8 @@
 		6679EF80248109540022541A /* Schedule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Schedule.swift; sourceTree = "<group>"; };
 		6679EF82248109C60022541A /* ScheduleFireStoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleFireStoreManager.swift; sourceTree = "<group>"; };
 		6679EF8424810A380022541A /* Member.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Member.swift; sourceTree = "<group>"; };
+		668D0189249239C800D84F6C /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
+		66B90A24249885390087A73C /* ErrorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
 		66DB126C24862C3100BF351A /* ScheduleRealm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleRealm.swift; sourceTree = "<group>"; };
 		66DB126E2487AD3900BF351A /* TimeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeTableViewController.swift; sourceTree = "<group>"; };
 		66DB12702487BA8400BF351A /* MemberRealm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberRealm.swift; sourceTree = "<group>"; };
@@ -105,6 +111,7 @@
 				665AB83F245C422A003C766D /* LaunchScreen.storyboard */,
 				665AB842245C422A003C766D /* Info.plist */,
 				665630BE245C512200A50100 /* GoogleService-Info.plist */,
+				66B90A24249885390087A73C /* ErrorHandler.swift */,
 			);
 			path = Comuse;
 			sourceTree = "<group>";
@@ -115,6 +122,7 @@
 				66DB126E2487AD3900BF351A /* TimeTableViewController.swift */,
 				66DB12742487C04400BF351A /* MemberViewController.swift */,
 				6638E9D2248D646D00E5EFE1 /* SettingsTableViewController.swift */,
+				660ACC2A2490E3E5005D7BF6 /* EditAddScheduleViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -163,6 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				1365BD6E4D2CE6FC6A99D7E2 /* Pods-Comuse.debug.xcconfig */,
+				668D0189249239C800D84F6C /* SignInViewController.swift */,
 				D07E046CB37576AFA9DA6FB3 /* Pods-Comuse.release.xcconfig */,
 			);
 			path = Pods;
@@ -311,6 +320,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				667970EC24810AA4001C2A20 /* UserDataFireStoreManager.swift in Sources */,
+				660ACC2B2490E3E5005D7BF6 /* EditAddScheduleViewController.swift in Sources */,
 				665AB835245C422A003C766D /* AppDelegate.swift in Sources */,
 				6679EF83248109C60022541A /* ScheduleFireStoreManager.swift in Sources */,
 				6638E9CD248BDBD400E5EFE1 /* UserDataDefaults.swift in Sources */,
@@ -318,6 +328,7 @@
 				66DB126D24862C3100BF351A /* ScheduleRealm.swift in Sources */,
 				66DB12732487BC4500BF351A /* MemberViewModel.swift in Sources */,
 				6638E9CF248BDE5D00E5EFE1 /* UserDataViewModel.swift in Sources */,
+				668D018A249239C800D84F6C /* SignInViewController.swift in Sources */,
 				667970EA24810A92001C2A20 /* MemberFireStoreManager.swift in Sources */,
 				6679EF8524810A380022541A /* Member.swift in Sources */,
 				66DB12752487C04400BF351A /* MemberViewController.swift in Sources */,
@@ -325,6 +336,7 @@
 				6638E9D3248D646D00E5EFE1 /* SettingsTableViewController.swift in Sources */,
 				66DB126F2487AD3900BF351A /* TimeTableViewController.swift in Sources */,
 				66DB12712487BA8400BF351A /* MemberRealm.swift in Sources */,
+				66B90A25249885390087A73C /* ErrorHandler.swift in Sources */,
 				665AB837245C422A003C766D /* SceneDelegate.swift in Sources */,
 				660E5BFB245D2E6F007154A1 /* FirebaseVar.swift in Sources */,
 			);

@@ -9,47 +9,79 @@
 import UIKit
 import RxCocoa
 import RxSwift
+import FirebaseAuth
+
 class MemberViewController: UIViewController {
     
+    //IBOutlet
     @IBOutlet weak var positionLabel: UILabel!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var inoutButton: UIButton!
     @IBAction func touchUpInoutButton(_ sender: UIButton) {
-        if (sender.titleLabel?.text == "in") {
-            userDataViewModel.updateInoutStatus(inoutStatus: false)
+        if (self.userData?.inoutStatus == true) {
+            UserDataViewModel.userDataViewModel.updateInoutStatus(inoutStatus: false)
         } else {
-            userDataViewModel.updateInoutStatus(inoutStatus: true)
+            UserDataViewModel.userDataViewModel.updateInoutStatus(inoutStatus: true)
         }
     }
-    
     @IBOutlet weak var memberTable: UITableView!
     
+    // View Tag (User Info)
     let nameLabelTag = 101
     let positionLabelTag = 102
     let inoutStatusLabelTag = 103
-    private var memberViewModel = MemberViewModel()
-    private var userDataViewModel = UserDataViewModel()
+    
+    private let disposebag = DisposeBag()
+    
+    //User Data
+    private var userData: Member?
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        memberTable.delegate = nil
+        memberTable.dataSource = nil
         
         // bind members to TableView
-        memberViewModel.getMembers().bind(to: memberTable.rx.items(cellIdentifier: "memberCell")) { row, element, cell in
+        self.bindMembers()
+        //bind userData to User Info
+        self.bindUserData()
+        
+        _ = Auth.auth().addStateDidChangeListener { (auth, user) in         // Login State Listener
+            if let _ = user {
+                UserDataViewModel.userDataViewModel.getUserData()
+                MemberViewModel.memberViewModel.getMembers()
+            }
+        }
+    }
+    
+    // MARK: - bind User Data Method
+    private func bindUserData() {
+        UserDataViewModel.userDataViewModel.userDataForView.subscribe(
+            onNext: { userData in
+                self.userData = userData
+                self.positionLabel.text = userData.position
+                self.nameLabel.text = userData.name
+                if (userData.inoutStatus == true) { self.inoutButton.setTitle("in", for: .normal) }
+                else { self.inoutButton.setTitle("out",for: .normal) }
+            },
+            onError: { error in
+                ErrorHandler.generateSnackBarWithAction(title: error.localizedDescription, actionTitle: "ReFresh", onAction: self.bindUserData)
+            }
+        ).disposed(by: self.disposebag)
+    }
+    
+    // MARK: - bind Members Method
+    private func bindMembers() {
+        MemberViewModel.memberViewModel.membersForView.bind(to: memberTable.rx.items(cellIdentifier: "memberTableCell")) { row, element, cell in
             (cell.viewWithTag(self.nameLabelTag) as! UILabel).text = element.name
             (cell.viewWithTag(self.positionLabelTag) as! UILabel).text = element.position
-            (cell.viewWithTag(self.inoutStatusLabelTag) as! UILabel).text = element.inoutStatus.description
-        }
-        
-        // bind userData in User Info
-        userDataViewModel.getUserData().subscribe(onNext: { userData in
-            self.positionLabel.text = userData.position
-            self.nameLabel.text = userData.name
-            if (userData.inoutStatus == true) { self.inoutButton.titleLabel?.text = "in" }
-            else { self.inoutButton.titleLabel?.text = "out" }
-        })
+            if (element.inoutStatus == true) { (cell.viewWithTag(self.inoutStatusLabelTag) as! UILabel).text = "in" }
+            else { (cell.viewWithTag(self.inoutStatusLabelTag) as! UILabel).text = "out"}
+        }.disposed(by: disposebag)
         
     }
     
-
     /*
     // MARK: - Navigation
 

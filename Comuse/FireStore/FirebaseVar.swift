@@ -10,6 +10,7 @@
 import GoogleSignIn
 import FirebaseFirestore
 import FirebaseAuth
+
 struct FirebaseVar {
     /*
         user 객체는 앱이 실행 될 때 Auth.currentUser(AppDelegate) 을 통해 초기화한다. 로그인 기록이 있으면 데이터가 들어오고, 로그인 기록이 없으면 nil 로 초기화 된다.
