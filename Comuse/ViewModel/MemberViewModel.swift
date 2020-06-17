@@ -20,7 +20,7 @@ class MemberViewModel {
     // Local Communication Object
     private let memberRealm = MemberRealm()
     
-    public var membersForView = PublishSubject<[Member]>()
+    public var membersForView = ReplaySubject<[Member]>.create(bufferSize: 100)
     
     private let disposebag = DisposeBag()
     

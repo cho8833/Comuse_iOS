@@ -39,10 +39,9 @@ class SettingsTableViewController: UITableViewController {
         } else {
             do {
                 try Auth.auth().signOut()
+                FirebaseVar.memberListener?.remove()
+                FirebaseVar.scheduleListener?.remove()
                 FirebaseVar.dbFIB = nil
-                // stop listening
-                FirebaseVar.memberListener = nil
-                FirebaseVar.scheduleListener = nil
             } catch {
                 // signout falied
             }
@@ -70,6 +69,7 @@ class SettingsTableViewController: UITableViewController {
             } else {
                 // signed out
                 self.signButton.setTitle("Sign In", for: .normal)
+                UserDataViewModel.userDataViewModel.userDataForView.onNext(Member(name: "", email: "", inoutStatus: false, position: ""))
             }
             
         }

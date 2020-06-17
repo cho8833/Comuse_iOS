@@ -11,7 +11,7 @@ import RxSwift
 
 class MemberFireStoreManager {
     private var membersList = Array<Member>()
-    public var membersSubject = PublishSubject<[Member]>()
+    public var membersSubject = ReplaySubject<[Member]>.create(bufferSize: 100)
     
     private var memberRealm = MemberRealm()
 }

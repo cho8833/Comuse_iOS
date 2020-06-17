@@ -19,7 +19,7 @@ struct ScheduleViewModel {
     // Local Communication Object
     public let scheduleRealm: ScheduleRealm = ScheduleRealm()
     
-    public var schedulesForView = PublishSubject<[Schedule]>()
+    public var schedulesForView = ReplaySubject<[Schedule]>.create(bufferSize: 20)
     
     public let disposebag = DisposeBag()
     
@@ -36,7 +36,7 @@ struct ScheduleViewModel {
             self.schedulesForView.onNext(schedules)
         }).disposed(by: self.disposebag)
     }
-    public func getSchedulesFromGlobal() -> PublishSubject<[Schedule]> {
+    public func getSchedulesFromGlobal() -> ReplaySubject<[Schedule]> {
         fireStoreManager.getSchedulesFromFireStore()
         fireStoreManager.schedulesSubject.subscribe(onNext: { schedules in
             self.schedulesForView.onNext(schedules)

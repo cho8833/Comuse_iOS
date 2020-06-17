@@ -36,6 +36,8 @@ class TimeTableViewController: UIViewController, ElliotableDelegate, ElliotableD
         _ = Auth.auth().addStateDidChangeListener { (auth, user) in         // Login State Listener
             if let _ = user {
                 ScheduleViewModel.scheduleViewModel.getSchedules()
+            } else {
+                ScheduleViewModel.scheduleViewModel.schedulesForView.onNext([])
             }
         }
     }
@@ -145,9 +147,9 @@ extension TimeTableViewController {
 //MARK: Privates
 extension TimeTableViewController {
     private func getBackgroundColor() -> UIColor {
-        if self.colorIndex == backgroundColors.count {
+        if self.colorIndex >= backgroundColors.count-1 {
             colorIndex = 0
-        } else { colorIndex += 1}
+        } else { self.colorIndex += 1}
         return UIColor.colorWithRGBHex(hex: backgroundColors[colorIndex])
     }
 }

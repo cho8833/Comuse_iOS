@@ -12,7 +12,7 @@ import ObjectMapper
 
 class ScheduleFireStoreManager {
     private var schedulesList: [Schedule] = []
-    public var schedulesSubject: PublishSubject<[Schedule]> = PublishSubject()
+    public var schedulesSubject = ReplaySubject<[Schedule]>.create(bufferSize: 20)
     
     private var scheduleRealm = ScheduleRealm()
 }

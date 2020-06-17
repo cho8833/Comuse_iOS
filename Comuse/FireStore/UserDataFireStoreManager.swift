@@ -11,7 +11,7 @@ import RxSwift
 
 class UserDataFireStoreManager {
     private var userData: Member?
-    public var userDataSubject = PublishSubject<Member>()
+    public var userDataSubject = ReplaySubject<Member>.create(bufferSize: 1)
 }
 
 extension UserDataFireStoreManager {

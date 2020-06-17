@@ -49,8 +49,14 @@ class MemberViewController: UIViewController {
         
         _ = Auth.auth().addStateDidChangeListener { (auth, user) in         // Login State Listener
             if let _ = user {
+                // signed in
                 UserDataViewModel.userDataViewModel.getUserData()
                 MemberViewModel.memberViewModel.getMembers()
+            } else {
+                // signed out
+                UserDataViewModel.userDataViewModel.userDataForView.onNext(Member(name: "", email: "", inoutStatus: false, position: ""))
+                MemberViewModel.memberViewModel.membersForView.onNext([])
+                self.userData = nil
             }
         }
     }

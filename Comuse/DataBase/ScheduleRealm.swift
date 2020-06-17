@@ -22,7 +22,7 @@ class ScheduleRealm {
                 let schedules = realm.objects(Schedule.self)
                 schedulesList.append(contentsOf: schedules)
                 schedulesSubject.onNext(schedulesList)
-                print("\(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])")
+                
             }
         } catch {
             self.schedulesSubject.onError(error)
